@@ -7,6 +7,9 @@ from app.schemas.practice import (
     RetryAttemptCreate,
 )
 from app.memory.learner_memory import update_error_memory
+from app.models.analysis import Analysis
+from app.schemas.practice import WritingAnalysisResult
+
 
 def create_writing_attempt(
     db: Session,
@@ -155,4 +158,62 @@ def analyze_attempt(
         "original_text": attempt.text,
         "analysis": analysis,
         "memory_updated": len(memory_updates) > 0,
+    }
+
+def analyze_attempt(
+    db: Session,
+    attempt_id: int,
+):
+
+    attempt = get_attempt_by_id(
+        db=db,
+        attempt_id=attempt_id,
+    )
+
+    if attempt is None:
+        return None
+
+    existing_analysis = (
+        db.query(Analysis)
+        .filter(Analysis.attempt_id == attempt_id)
+        .first()
+    )
+
+    if existing_analysis:
+
+        analysis = WritingAnalysisResult(
+            **existing_analysis.result
+        )
+
+        return {
+            "attempt_id": attempt.id,
+            "original_text": attempt.text,
+            "analysis": analysis,
+            "memory_updated": False,
+            "source": "stored_analysis",
+        }
+
+    analysis = analyze_writing(attempt.text)
+
+    saved_analysis = Analysis(
+        attempt_id=attempt.id,
+        result=analysis.model_dump(),
+    )
+
+    db.add(saved_analysis)
+
+    memory_updates = update_error_memory(
+        db=db,
+        learner_id=1,
+        analysis=analysis,
+    )
+
+    db.commit()
+
+    return {
+        "attempt_id": attempt.id,
+        "original_text": attempt.text,
+        "analysis": analysis,
+        "memory_updated": len(memory_updates) > 0,
+        "source": "new_analysis",
     }

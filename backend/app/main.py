@@ -5,6 +5,8 @@ from app.api.practice import router as practice_router
 from app.core.database import Base, engine
 from app.models.error_pattern import ErrorPattern
 from app.models.practice_attempt import PracticeAttempt
+from app.models.analysis import Analysis
+
 app = FastAPI(
     title="FluentPath AI API",
     description="Backend API for the FluentPath AI Personal English Communication Coach",
