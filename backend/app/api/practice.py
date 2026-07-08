@@ -2,9 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.schemas.practice import PracticeAttemptCreate
 from app.services import practice_service
-
+from app.schemas.practice import (
+    PracticeAttemptCreate,
+    RetryAttemptCreate,
+)
 
 router = APIRouter(
     prefix="/api/v1/practice",
@@ -73,6 +75,27 @@ def analyze_practice_attempt(
         raise HTTPException(
             status_code=404,
             detail="Practice attempt not found",
+        )
+
+    return result
+
+@router.post("/attempts/{attempt_id}/retry")
+def retry_practice_attempt(
+    attempt_id: int,
+    retry_data: RetryAttemptCreate,
+    db: Session = Depends(get_db),
+):
+
+    result = practice_service.create_retry_attempt(
+        db=db,
+        original_attempt_id=attempt_id,
+        retry_data=retry_data,
+    )
+
+    if result is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Original practice attempt not found",
         )
 
     return result

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, Integer, String
+from sqlalchemy import DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
@@ -23,6 +23,18 @@ class PracticeAttempt(Base):
     practice_type: Mapped[str] = mapped_column(
         String(50),
         default="writing",
+        nullable=False,
+    )
+
+    parent_attempt_id: Mapped[int | None] = mapped_column(
+        Integer,
+        ForeignKey("practice_attempts.id"),
+        nullable=True,
+    )
+
+    attempt_number: Mapped[int] = mapped_column(
+        Integer,
+        default=1,
         nullable=False,
     )
 

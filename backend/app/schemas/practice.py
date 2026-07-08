@@ -17,3 +17,6 @@ class WritingAnalysisResult(BaseModel):
     has_errors: bool
     errors: list[DetectedError]
     instruction: str
+
+class RetryAttemptCreate(BaseModel):
+    text: str

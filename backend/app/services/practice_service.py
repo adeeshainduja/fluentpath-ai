@@ -1,9 +1,11 @@
 from sqlalchemy.orm import Session
 
 from app.models.practice_attempt import PracticeAttempt
-from app.schemas.practice import PracticeAttemptCreate
 from app.agents.writing_analysis_agent import analyze_writing
-
+from app.schemas.practice import (
+    PracticeAttemptCreate,
+    RetryAttemptCreate,
+)
 
 def create_writing_attempt(
     db: Session,
@@ -63,4 +65,65 @@ def analyze_attempt(
         "attempt_id": attempt.id,
         "original_text": attempt.text,
         "analysis": analysis,
+    }
+
+def create_retry_attempt(
+    db: Session,
+    original_attempt_id: int,
+    retry_data: RetryAttemptCreate,
+):
+
+    original_attempt = get_attempt_by_id(
+        db=db,
+        attempt_id=original_attempt_id,
+    )
+
+    if original_attempt is None:
+        return None
+
+    retry_attempt = PracticeAttempt(
+        text=retry_data.text,
+        practice_type=original_attempt.practice_type,
+        parent_attempt_id=original_attempt.id,
+        attempt_number=original_attempt.attempt_number + 1,
+    )
+
+    db.add(retry_attempt)
+    db.commit()
+    db.refresh(retry_attempt)
+
+    original_analysis = analyze_writing(
+        original_attempt.text
+    )
+
+    retry_analysis = analyze_writing(
+        retry_attempt.text
+    )
+
+    original_error_count = len(
+        original_analysis.errors
+    )
+
+    retry_error_count = len(
+        retry_analysis.errors
+    )
+
+    improved = (
+        retry_error_count < original_error_count
+    )
+
+    return {
+        "original_attempt": {
+            "id": original_attempt.id,
+            "text": original_attempt.text,
+            "error_count": original_error_count,
+        },
+        "retry_attempt": {
+            "id": retry_attempt.id,
+            "text": retry_attempt.text,
+            "attempt_number": retry_attempt.attempt_number,
+            "error_count": retry_error_count,
+        },
+        "improved": improved,
+        "analysis": retry_analysis,
     }
