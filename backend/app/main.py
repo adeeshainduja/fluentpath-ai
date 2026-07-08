@@ -3,7 +3,8 @@ from sqlalchemy import text
 
 from app.core.database import engine
 from app.api.practice import router as practice_router
-
+from app.core.database import Base, engine
+from app.models.practice_attempt import PracticeAttempt
 
 app = FastAPI(
     title="FluentPath AI API",
@@ -11,6 +12,7 @@ app = FastAPI(
     version="0.1.0",
 )
 
+Base.metadata.create_all(bind=engine)
 
 app.include_router(practice_router)
 
