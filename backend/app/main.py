@@ -1,5 +1,7 @@
 from fastapi import FastAPI
+from sqlalchemy import text
 
+from app.core.database import engine
 from app.api.practice import router as practice_router
 
 
@@ -24,4 +26,13 @@ def root():
 def health_check():
     return {
         "status": "healthy"
+    }
+
+@app.get("/health/database")
+def database_health_check():
+    with engine.connect() as connection:
+        connection.execute(text("SELECT 1"))
+
+    return {
+        "database": "connected"
     }
