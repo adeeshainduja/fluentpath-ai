@@ -1,11 +1,10 @@
 from fastapi import FastAPI
 from sqlalchemy import text
 
-from app.core.database import engine
 from app.api.practice import router as practice_router
 from app.core.database import Base, engine
+from app.models.error_pattern import ErrorPattern
 from app.models.practice_attempt import PracticeAttempt
-
 app = FastAPI(
     title="FluentPath AI API",
     description="Backend API for the FluentPath AI Personal English Communication Coach",

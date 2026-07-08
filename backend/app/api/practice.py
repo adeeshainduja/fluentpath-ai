@@ -7,6 +7,7 @@ from app.schemas.practice import (
     PracticeAttemptCreate,
     RetryAttemptCreate,
 )
+from app.memory.learner_memory import get_learner_weaknesses
 
 router = APIRouter(
     prefix="/api/v1/practice",
@@ -99,3 +100,16 @@ def retry_practice_attempt(
         )
 
     return result
+
+@router.get("/learners/{learner_id}/weaknesses")
+def get_weaknesses(
+    learner_id: int,
+    db: Session = Depends(get_db),
+):
+
+    weaknesses = get_learner_weaknesses(
+        db=db,
+        learner_id=learner_id,
+    )
+
+    return weaknesses

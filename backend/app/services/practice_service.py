@@ -6,6 +6,7 @@ from app.schemas.practice import (
     PracticeAttemptCreate,
     RetryAttemptCreate,
 )
+from app.memory.learner_memory import update_error_memory
 
 def create_writing_attempt(
     db: Session,
@@ -126,4 +127,32 @@ def create_retry_attempt(
         },
         "improved": improved,
         "analysis": retry_analysis,
+    }
+
+def analyze_attempt(
+    db: Session,
+    attempt_id: int,
+):
+
+    attempt = get_attempt_by_id(
+        db=db,
+        attempt_id=attempt_id,
+    )
+
+    if attempt is None:
+        return None
+
+    analysis = analyze_writing(attempt.text)
+
+    memory_updates = update_error_memory(
+        db=db,
+        learner_id=1,
+        analysis=analysis,
+    )
+
+    return {
+        "attempt_id": attempt.id,
+        "original_text": attempt.text,
+        "analysis": analysis,
+        "memory_updated": len(memory_updates) > 0,
     }
