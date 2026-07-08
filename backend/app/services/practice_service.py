@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 
 from app.models.practice_attempt import PracticeAttempt
 from app.schemas.practice import PracticeAttemptCreate
+from app.agents.writing_analysis_agent import analyze_writing
 
 
 def create_writing_attempt(
@@ -42,3 +43,24 @@ def get_attempt_by_id(
         .filter(PracticeAttempt.id == attempt_id)
         .first()
     )
+
+def analyze_attempt(
+    db: Session,
+    attempt_id: int,
+):
+
+    attempt = get_attempt_by_id(
+        db=db,
+        attempt_id=attempt_id,
+    )
+
+    if attempt is None:
+        return None
+
+    analysis = analyze_writing(attempt.text)
+
+    return {
+        "attempt_id": attempt.id,
+        "original_text": attempt.text,
+        "analysis": analysis,
+    }

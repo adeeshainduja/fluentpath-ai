@@ -57,3 +57,22 @@ def get_attempt(
         )
 
     return attempt
+
+@router.post("/attempts/{attempt_id}/analyze")
+def analyze_practice_attempt(
+    attempt_id: int,
+    db: Session = Depends(get_db),
+):
+
+    result = practice_service.analyze_attempt(
+        db=db,
+        attempt_id=attempt_id,
+    )
+
+    if result is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Practice attempt not found",
+        )
+
+    return result
