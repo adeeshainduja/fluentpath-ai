@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from sqlalchemy import text
 
+from app.models.correction_state import CorrectionState
 from app.api.practice import router as practice_router
 from app.core.database import Base, engine
 from app.models.error_pattern import ErrorPattern
