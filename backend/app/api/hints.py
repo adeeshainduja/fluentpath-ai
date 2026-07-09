@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.services.hint_service import get_hint
+from app.services.hint_service import get_next_hint
 
 
 router = APIRouter(
@@ -12,26 +12,18 @@ router = APIRouter(
 
 
 @router.get(
-    "/attempts/{attempt_id}/errors/{error_index}"
+    "/attempts/{attempt_id}/errors/{error_index}/next"
 )
-def request_hint(
+def request_next_hint(
     attempt_id: int,
     error_index: int,
-    level: int = 1,
     db: Session = Depends(get_db),
 ):
 
-    if level not in [1, 2, 3]:
-        raise HTTPException(
-            status_code=400,
-            detail="Hint level must be 1, 2, or 3",
-        )
-
-    result = get_hint(
+    result = get_next_hint(
         db=db,
         attempt_id=attempt_id,
         error_index=error_index,
-        hint_level=level,
     )
 
     if result is None:
