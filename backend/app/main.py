@@ -9,6 +9,7 @@ from app.models.analysis import Analysis
 from app.api.learning_plan import (
     router as learning_plan_router,
 )
+from app.api.hints import router as hints_router
 
 app = FastAPI(
     title="FluentPath AI API",
@@ -20,6 +21,7 @@ Base.metadata.create_all(bind=engine)
 
 app.include_router(practice_router)
 app.include_router(learning_plan_router)
+app.include_router(hints_router)
 
 @app.get("/")
 def root():
