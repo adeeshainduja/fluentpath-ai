@@ -55,3 +55,15 @@ def get_or_create_correction_state(
 
     return state
 
+def advance_hint_level(
+    db: Session,
+    state: CorrectionState,
+):
+
+    if state.current_hint_level < 3:
+        state.current_hint_level += 1
+
+    db.commit()
+    db.refresh(state)
+
+    return state
