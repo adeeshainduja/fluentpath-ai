@@ -67,3 +67,25 @@ def advance_hint_level(
     db.refresh(state)
 
     return state
+
+def record_retry_result(
+    db: Session,
+    state: CorrectionState,
+    resolved: bool,
+):
+
+    state.retry_count += 1
+
+    if resolved:
+        state.status = "resolved"
+
+    elif state.current_hint_level < 3:
+        state.current_hint_level += 1
+
+    else:
+        state.status = "needs_review"
+
+    db.commit()
+    db.refresh(state)
+
+    return state
