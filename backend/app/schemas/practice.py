@@ -5,6 +5,10 @@ class PracticeAttemptCreate(BaseModel):
     text: str
 
 
+class RetryAttemptCreate(BaseModel):
+    text: str
+
+
 class DetectedError(BaseModel):
     error_type: str
     category: str
@@ -17,6 +21,3 @@ class WritingAnalysisResult(BaseModel):
     has_errors: bool
     errors: list[DetectedError]
     instruction: str
-
-class RetryAttemptCreate(BaseModel):
-    text: str
