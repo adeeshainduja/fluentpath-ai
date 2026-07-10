@@ -21,6 +21,9 @@ from app.models.practice_task import PracticeTask
 from app.api.practice_tasks import (
     router as practice_tasks_router,
 )
+from app.api.progress_comparisons import (
+    router as progress_comparisons_router,
+)
 
 
 
@@ -38,7 +41,7 @@ app.include_router(hints_router)
 app.include_router(evaluations_router)
 app.include_router(task_evaluations_router)
 app.include_router(practice_tasks_router)
-
+app.include_router(progress_comparisons_router)
 
 @app.get("/")
 def root():
