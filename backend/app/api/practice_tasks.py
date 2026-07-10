@@ -16,9 +16,9 @@ from app.services.practice_task_service import (
     generate_and_save_task,
     get_learner_tasks,
     get_task,
+    get_task_attempts,
     submit_task_attempt,
 )
-
 
 router = APIRouter(
     prefix="/api/v1/practice-tasks",
@@ -124,4 +124,39 @@ def submit_task(
         "learner_id": result.learner_id,
         "text": result.text,
         "attempt_number": result.attempt_number,
+    }
+
+@router.get("/{task_id}/attempts")
+def list_task_attempts(
+    task_id: int,
+    db: Session = Depends(get_db),
+):
+    task = get_task(
+        db=db,
+        task_id=task_id,
+    )
+
+    if task is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Practice task not found",
+        )
+
+    attempts = get_task_attempts(
+        db=db,
+        task_id=task_id,
+    )
+
+    return {
+        "task_id": task_id,
+        "task_status": task.status,
+        "total_attempts": len(attempts),
+        "attempts": [
+            {
+                "attempt_id": attempt.id,
+                "attempt_number": attempt.attempt_number,
+                "text": attempt.text,
+            }
+            for attempt in attempts
+        ],
     }

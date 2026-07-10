@@ -91,17 +91,47 @@ def submit_task_attempt(
             "error": "Practice task not found"
         }
 
+    if task.status == "completed":
+        return {
+            "error": "This practice task is already completed"
+        }
+
+    previous_attempt_count = (
+        db.query(PracticeAttempt)
+        .filter(
+            PracticeAttempt.task_id == task_id
+        )
+        .count()
+    )
+
+    next_attempt_number = previous_attempt_count + 1
+
     attempt = PracticeAttempt(
         learner_id=task.learner_id,
         task_id=task.id,
         text=text,
-        attempt_number=1,
+        attempt_number=next_attempt_number,
     )
 
-    task.status = "completed"
+    task.status = "submitted"
 
     db.add(attempt)
     db.commit()
     db.refresh(attempt)
 
     return attempt
+
+def get_task_attempts(
+    db: Session,
+    task_id: int,
+):
+    return (
+        db.query(PracticeAttempt)
+        .filter(
+            PracticeAttempt.task_id == task_id
+        )
+        .order_by(
+            PracticeAttempt.attempt_number.asc()
+        )
+        .all()
+    )
