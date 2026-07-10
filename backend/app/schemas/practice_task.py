@@ -5,6 +5,10 @@ class PracticeTaskCreate(BaseModel):
     learner_id: int
 
 
+class PracticeTaskSubmission(BaseModel):
+    text: str
+
+
 class PracticeTaskResponse(BaseModel):
     id: int
     learner_id: int

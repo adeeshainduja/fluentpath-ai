@@ -7,6 +7,7 @@ from app.memory.learner_memory import (
     get_learner_weaknesses,
 )
 from app.models.practice_task import PracticeTask
+from app.models.practice_attempt import PracticeAttempts
 
 
 def generate_and_save_task(
@@ -74,3 +75,33 @@ def get_task(
         )
         .first()
     )
+
+def submit_task_attempt(
+    db: Session,
+    task_id: int,
+    text: str,
+):
+    task = get_task(
+        db=db,
+        task_id=task_id,
+    )
+
+    if task is None:
+        return {
+            "error": "Practice task not found"
+        }
+
+    attempt = PracticeAttempt(
+        learner_id=task.learner_id,
+        task_id=task.id,
+        text=text,
+        attempt_number=1,
+    )
+
+    task.status = "completed"
+
+    db.add(attempt)
+    db.commit()
+    db.refresh(attempt)
+
+    return attempt
