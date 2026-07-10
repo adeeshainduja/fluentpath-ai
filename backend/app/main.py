@@ -14,6 +14,10 @@ from app.api.hints import router as hints_router
 from app.api.evaluations import (
     router as evaluations_router,
 )
+from app.api.task_evaluations import (
+    router as task_evaluations_router,
+)
+from app.models.practice_task import PracticeTask
 
 app = FastAPI(
     title="FluentPath AI API",
@@ -27,6 +31,7 @@ app.include_router(practice_router)
 app.include_router(learning_plan_router)
 app.include_router(hints_router)
 app.include_router(evaluations_router)
+app.include_router(task_evaluations_router)
 
 @app.get("/")
 def root():
