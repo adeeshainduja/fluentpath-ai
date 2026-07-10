@@ -7,7 +7,7 @@ from app.memory.learner_memory import (
     get_learner_weaknesses,
 )
 from app.models.practice_task import PracticeTask
-from app.models.practice_attempt import PracticeAttempts
+from app.models.practice_attempt import PracticeAttempt
 
 
 def generate_and_save_task(
