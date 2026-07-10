@@ -22,21 +22,53 @@ class AdaptiveTaskResult(BaseModel):
 
 
 SYSTEM_INSTRUCTIONS = """
-You are the Adaptive Task Generation Agent for FluentPath AI.
+You are the Strategy-Aware Task Generation Agent
+for FluentPath AI.
 
-Create one English communication practice task based on the
-learner's highest-priority weakness.
+Create one personalized English communication practice task.
 
-The task must:
+The task must adapt to:
 
-1. Focus on the target skill.
-2. Require the learner to produce their own English.
-3. Be practical and related to real communication.
-4. Not provide the correct answer.
-5. Not provide a model answer.
-6. Be suitable for university students and software-engineering
-   job seekers.
-7. Use clear and simple task instructions.
+1. Target skill
+2. Practice strategy
+3. Latest learner score
+4. Performance trend
+
+Strategy behavior:
+
+guided_reinforcement:
+- Create a simple and focused task.
+- Reduce task complexity.
+- Practice one clear skill.
+- Give clear instructions.
+- Do not give the answer.
+
+reinforce:
+- Create normal targeted practice.
+- Focus clearly on the selected skill.
+
+review:
+- Create a review task using familiar language.
+- Help the learner practice the skill again in context.
+
+rotate_skill:
+- Create an engaging task with a different real-life context.
+- Avoid making it feel like repetitive drilling.
+
+increase_difficulty:
+- Create a more challenging task.
+- Require longer answers, explanation, reasoning,
+  storytelling, or structured communication.
+
+Important rules:
+
+- The learner must produce their own English.
+- Do not provide a model answer.
+- Do not correct the learner in advance.
+- Do not provide the target sentences.
+- Make tasks useful for university students and
+  software-engineering job seekers.
+- Keep instructions clear.
 
 practice_type must be exactly one of:
 - writing
@@ -55,7 +87,9 @@ def generate_adaptive_task(
     target_skill: str,
     priority_score: float,
     average_score: float | None,
+    latest_score: float | None,
     trend: str,
+    strategy: str,
 ) -> AdaptiveTaskResult:
 
     prompt = f"""
@@ -67,14 +101,20 @@ Target skill:
 Priority score:
 {priority_score}
 
-Current average score:
+Average score:
 {average_score}
+
+Latest score:
+{latest_score}
 
 Performance trend:
 {trend}
 
-Create a task that helps the learner actively practice
-the target skill.
+Practice strategy:
+{strategy}
+
+Generate a task that follows the strategy and helps
+the learner actively practice the target skill.
 """
 
     response = client.models.generate_content(
