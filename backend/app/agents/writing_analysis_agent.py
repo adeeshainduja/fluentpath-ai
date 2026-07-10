@@ -1,43 +1,73 @@
-from app.schemas.practice import (
-    DetectedError,
-    WritingAnalysisResult,
+import os
+
+from dotenv import load_dotenv
+from google import genai
+from google.genai import types
+
+from app.schemas.practice import WritingAnalysisResult
+
+
+load_dotenv()
+
+
+client = genai.Client(
+    api_key=os.getenv("GEMINI_API_KEY")
 )
 
 
-def analyze_writing(text: str) -> WritingAnalysisResult:
+SYSTEM_INSTRUCTIONS = """
+You are the Writing Analysis Agent for FluentPath AI,
+a personalized English communication learning platform.
 
-    errors = []
+Analyze the learner's English writing for genuine problems in:
 
-    normalized_text = text.lower().strip()
+- grammar
+- tense usage
+- vocabulary usage
+- sentence structure
+- clarity
+- articles
+- prepositions
+- subject-verb agreement
+- word choice
 
-    if "yesterday i go" in normalized_text:
+Teaching rules:
 
-        errors.append(
-            DetectedError(
-                error_type="grammar",
-                category="past_tense",
-                problem_text="go",
-                explanation=(
-                    "The sentence describes an action "
-                    "that happened in the past."
-                ),
-                hint=(
-                    "Think about the past form "
-                    "of the verb 'go'."
-                ),
-            )
-        )
+1. Detect genuine errors only.
+2. Explain each error using simple learner-friendly English.
+3. Give a useful hint.
+4. Do NOT provide the complete corrected sentence.
+5. Do NOT directly reveal the final answer.
+6. Encourage the learner to think and retry.
+7. Keep categories consistent and reusable.
 
-    if errors:
+Preferred categories include:
 
-        return WritingAnalysisResult(
-            has_errors=True,
-            errors=errors,
-            instruction="Try writing the sentence again.",
-        )
+- past_tense
+- present_tense
+- subject_verb_agreement
+- article_usage
+- preposition_usage
+- word_choice
+- sentence_structure
+- clarity
+"""
 
-    return WritingAnalysisResult(
-        has_errors=False,
-        errors=[],
-        instruction="Good attempt. No known error was detected.",
+
+def analyze_writing(
+    text: str,
+) -> WritingAnalysisResult:
+
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=text,
+        config=types.GenerateContentConfig(
+            system_instruction=SYSTEM_INSTRUCTIONS,
+            response_mime_type="application/json",
+            response_schema=WritingAnalysisResult,
+        ),
+    )
+
+    return WritingAnalysisResult.model_validate_json(
+        response.text
     )

@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from sqlalchemy import text
 
+from app.models.correction_state import CorrectionState
 from app.api.practice import router as practice_router
 from app.core.database import Base, engine
 from app.models.error_pattern import ErrorPattern
@@ -8,6 +9,10 @@ from app.models.practice_attempt import PracticeAttempt
 from app.models.analysis import Analysis
 from app.api.learning_plan import (
     router as learning_plan_router,
+)
+from app.api.hints import router as hints_router
+from app.api.evaluations import (
+    router as evaluations_router,
 )
 
 app = FastAPI(
@@ -20,6 +25,8 @@ Base.metadata.create_all(bind=engine)
 
 app.include_router(practice_router)
 app.include_router(learning_plan_router)
+app.include_router(hints_router)
+app.include_router(evaluations_router)
 
 @app.get("/")
 def root():
