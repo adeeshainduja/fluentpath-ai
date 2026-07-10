@@ -28,6 +28,9 @@ from app.models.progress_metric import ProgressMetric
 from app.api.adaptive_priorities import (
     router as adaptive_priorities_router,
 )
+from app.api.practice_strategies import (
+    router as practice_strategies_router,
+)
 
 
 app = FastAPI(
@@ -46,7 +49,7 @@ app.include_router(task_evaluations_router)
 app.include_router(practice_tasks_router)
 app.include_router(progress_comparisons_router)
 app.include_router(adaptive_priorities_router)
-
+app.include_router(practice_strategies_router)
 
 @app.get("/")
 def root():
