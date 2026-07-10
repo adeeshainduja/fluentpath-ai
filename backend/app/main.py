@@ -25,7 +25,9 @@ from app.api.progress_comparisons import (
     router as progress_comparisons_router,
 )
 from app.models.progress_metric import ProgressMetric
-
+from app.api.adaptive_priorities import (
+    router as adaptive_priorities_router,
+)
 
 
 app = FastAPI(
@@ -43,6 +45,7 @@ app.include_router(evaluations_router)
 app.include_router(task_evaluations_router)
 app.include_router(practice_tasks_router)
 app.include_router(progress_comparisons_router)
+app.include_router(adaptive_priorities_router)
 
 
 @app.get("/")
