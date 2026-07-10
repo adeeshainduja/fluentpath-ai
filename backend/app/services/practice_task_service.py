@@ -3,14 +3,17 @@ from sqlalchemy.orm import Session
 from app.agents.learning_plan_agent import (
     create_learning_plan,
 )
-from app.memory.learner_memory import (
-    get_learner_weaknesses,
-)
-from app.models.practice_task import PracticeTask
-from app.models.practice_attempt import PracticeAttempt
 from app.agents.adaptive_task_agent import (
     generate_adaptive_task,
 )
+
+from app.memory.learner_memory import (
+    get_learner_weaknesses,
+)
+
+from app.models.practice_task import PracticeTask
+from app.models.practice_attempt import PracticeAttempt
+
 from app.services.adaptive_priority_service import (
     calculate_adaptive_priorities,
 )
@@ -18,6 +21,10 @@ from app.services.practice_strategy_service import (
     determine_practice_strategy,
 )
 
+
+# ============================================================
+# 1. GENERATE NORMAL PRACTICE TASK
+# ============================================================
 
 def generate_and_save_task(
     db: Session,
@@ -35,18 +42,26 @@ def generate_and_save_task(
 
     if not plan.has_recommendation:
         return {
-            "error": "No weaknesses available for task generation"
+            "error": (
+                "No weaknesses available "
+                "for task generation"
+            )
         }
 
     recommendation = plan.recommendation
 
     task = PracticeTask(
         learner_id=learner_id,
-        target_skill=recommendation.priority_category,
-        practice_type=recommendation.practice_type,
+        target_skill=(
+            recommendation.priority_category
+        ),
+        practice_type=(
+            recommendation.practice_type
+        ),
         difficulty=recommendation.difficulty,
         title=recommendation.title,
         instruction=recommendation.instruction,
+        strategy=None,
         status="pending",
     )
 
@@ -56,6 +71,10 @@ def generate_and_save_task(
 
     return task
 
+
+# ============================================================
+# 2. GET ALL TASKS FOR A LEARNER
+# ============================================================
 
 def get_learner_tasks(
     db: Session,
@@ -73,6 +92,10 @@ def get_learner_tasks(
     )
 
 
+# ============================================================
+# 3. GET ONE PRACTICE TASK
+# ============================================================
+
 def get_task(
     db: Session,
     task_id: int,
@@ -84,6 +107,11 @@ def get_task(
         )
         .first()
     )
+
+
+# ============================================================
+# 4. SUBMIT TASK ATTEMPT
+# ============================================================
 
 def submit_task_attempt(
     db: Session,
@@ -102,7 +130,9 @@ def submit_task_attempt(
 
     if task.status == "completed":
         return {
-            "error": "This practice task is already completed"
+            "error": (
+                "This practice task is already completed"
+            )
         }
 
     previous_attempt_count = (
@@ -113,7 +143,9 @@ def submit_task_attempt(
         .count()
     )
 
-    next_attempt_number = previous_attempt_count + 1
+    next_attempt_number = (
+        previous_attempt_count + 1
+    )
 
     attempt = PracticeAttempt(
         learner_id=task.learner_id,
@@ -130,6 +162,11 @@ def submit_task_attempt(
 
     return attempt
 
+
+# ============================================================
+# 5. GET TASK ATTEMPT HISTORY
+# ============================================================
+
 def get_task_attempts(
     db: Session,
     task_id: int,
@@ -145,10 +182,19 @@ def get_task_attempts(
         .all()
     )
 
+
+# ============================================================
+# 6. GENERATE ADAPTIVE PRACTICE TASK
+# ============================================================
+
 def generate_adaptive_practice_task(
     db: Session,
     learner_id: int,
 ):
+    # --------------------------------------------------------
+    # Step 1: Calculate learner priorities
+    # --------------------------------------------------------
+
     priorities = calculate_adaptive_priorities(
         db=db,
         learner_id=learner_id,
@@ -162,6 +208,10 @@ def generate_adaptive_practice_task(
             )
         }
 
+    # --------------------------------------------------------
+    # Step 2: Determine practice strategy
+    # --------------------------------------------------------
+
     strategy_result = determine_practice_strategy(
         db=db,
         learner_id=learner_id,
@@ -174,6 +224,10 @@ def generate_adaptive_practice_task(
         "selected_skill"
     ]
 
+    # --------------------------------------------------------
+    # Step 3: Find priority information for selected skill
+    # --------------------------------------------------------
+
     selected_priority = next(
         (
             item
@@ -182,6 +236,10 @@ def generate_adaptive_practice_task(
         ),
         priorities[0],
     )
+
+    # --------------------------------------------------------
+    # Step 4: Generate strategy-aware task
+    # --------------------------------------------------------
 
     generated_task = generate_adaptive_task(
         target_skill=selected_skill,
@@ -198,6 +256,10 @@ def generate_adaptive_practice_task(
         strategy=strategy_result["strategy"],
     )
 
+    # --------------------------------------------------------
+    # Step 5: Save generated task
+    # --------------------------------------------------------
+
     task = PracticeTask(
         learner_id=learner_id,
         target_skill=selected_skill,
@@ -207,6 +269,10 @@ def generate_adaptive_practice_task(
         difficulty=generated_task.difficulty,
         title=generated_task.title,
         instruction=generated_task.instruction,
+
+        # Save why this task was selected
+        strategy=strategy_result["strategy"],
+
         status="pending",
     )
 
