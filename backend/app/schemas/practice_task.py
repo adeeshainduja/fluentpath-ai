@@ -17,6 +17,7 @@ class PracticeTaskResponse(BaseModel):
     difficulty: str
     title: str
     instruction: str
+    strategy: str | None = None
     status: str
 
     model_config = {

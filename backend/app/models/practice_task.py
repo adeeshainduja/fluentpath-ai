@@ -62,3 +62,8 @@ class PracticeTask(Base):
         default=datetime.utcnow,
         nullable=False,
     )
+
+    strategy: Mapped[str | None] = mapped_column(
+        String(50),
+        nullable=True,
+    )
