@@ -4,6 +4,7 @@ from sqlalchemy import DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
+from sqlalchemy import ForeignKey
 
 
 class PracticeAttempt(Base):
@@ -42,4 +43,10 @@ class PracticeAttempt(Base):
         DateTime,
         default=datetime.utcnow,
         nullable=False,
+    )
+
+    task_id: Mapped[int | None] = mapped_column(
+        ForeignKey("practice_tasks.id"),
+        nullable=True,
+        index=True,
     )
