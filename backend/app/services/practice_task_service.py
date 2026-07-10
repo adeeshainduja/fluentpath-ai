@@ -191,7 +191,11 @@ def generate_adaptive_practice_task(
         average_score=selected_priority[
             "average_score"
         ],
+        latest_score=selected_priority[
+            "latest_score"
+        ],
         trend=selected_priority["trend"],
+        strategy=strategy_result["strategy"],
     )
 
     task = PracticeTask(
