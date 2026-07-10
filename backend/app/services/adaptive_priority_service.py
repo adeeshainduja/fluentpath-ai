@@ -64,8 +64,14 @@ def calculate_adaptive_priorities(
                 "error_frequency": 0,
             }
 
+        active_error_count = max(
+            pattern.occurrence_count
+            - pattern.resolved_count,
+            0,
+        )
+
         combined[category]["error_frequency"] += (
-            pattern.frequency
+            active_error_count
         )
 
     # ---------------------------------------------
