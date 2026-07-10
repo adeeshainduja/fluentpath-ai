@@ -14,6 +14,9 @@ from app.agents.adaptive_task_agent import (
 from app.services.adaptive_priority_service import (
     calculate_adaptive_priorities,
 )
+from app.services.practice_strategy_service import (
+    determine_practice_strategy,
+)
 
 
 def generate_and_save_task(
@@ -159,19 +162,44 @@ def generate_adaptive_practice_task(
             )
         }
 
-    top_priority = priorities[0]
+    strategy_result = determine_practice_strategy(
+        db=db,
+        learner_id=learner_id,
+    )
+
+    if "error" in strategy_result:
+        return strategy_result
+
+    selected_skill = strategy_result[
+        "selected_skill"
+    ]
+
+    selected_priority = next(
+        (
+            item
+            for item in priorities
+            if item["skill"] == selected_skill
+        ),
+        priorities[0],
+    )
 
     generated_task = generate_adaptive_task(
-        target_skill=top_priority["skill"],
-        priority_score=top_priority["priority_score"],
-        average_score=top_priority["average_score"],
-        trend=top_priority["trend"],
+        target_skill=selected_skill,
+        priority_score=selected_priority[
+            "priority_score"
+        ],
+        average_score=selected_priority[
+            "average_score"
+        ],
+        trend=selected_priority["trend"],
     )
 
     task = PracticeTask(
         learner_id=learner_id,
-        target_skill=top_priority["skill"],
-        practice_type=generated_task.practice_type,
+        target_skill=selected_skill,
+        practice_type=(
+            generated_task.practice_type
+        ),
         difficulty=generated_task.difficulty,
         title=generated_task.title,
         instruction=generated_task.instruction,
