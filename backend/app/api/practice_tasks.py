@@ -14,6 +14,7 @@ from app.schemas.practice_task import (
 
 from app.services.practice_task_service import (
     generate_and_save_task,
+    generate_adaptive_practice_task,
     get_learner_tasks,
     get_task,
     get_task_attempts,
@@ -160,3 +161,24 @@ def list_task_attempts(
             for attempt in attempts
         ],
     }
+
+@router.post(
+    "/learners/{learner_id}/generate-adaptive",
+    response_model=PracticeTaskResponse,
+)
+def generate_adaptive_task_endpoint(
+    learner_id: int,
+    db: Session = Depends(get_db),
+):
+    result = generate_adaptive_practice_task(
+        db=db,
+        learner_id=learner_id,
+    )
+
+    if isinstance(result, dict) and "error" in result:
+        raise HTTPException(
+            status_code=400,
+            detail=result["error"],
+        )
+
+    return result

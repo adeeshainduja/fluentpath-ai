@@ -8,6 +8,12 @@ from app.memory.learner_memory import (
 )
 from app.models.practice_task import PracticeTask
 from app.models.practice_attempt import PracticeAttempt
+from app.agents.adaptive_task_agent import (
+    generate_adaptive_task,
+)
+from app.services.adaptive_priority_service import (
+    calculate_adaptive_priorities,
+)
 
 
 def generate_and_save_task(
@@ -135,3 +141,45 @@ def get_task_attempts(
         )
         .all()
     )
+
+def generate_adaptive_practice_task(
+    db: Session,
+    learner_id: int,
+):
+    priorities = calculate_adaptive_priorities(
+        db=db,
+        learner_id=learner_id,
+    )
+
+    if not priorities:
+        return {
+            "error": (
+                "Not enough learner data to generate "
+                "an adaptive task"
+            )
+        }
+
+    top_priority = priorities[0]
+
+    generated_task = generate_adaptive_task(
+        target_skill=top_priority["skill"],
+        priority_score=top_priority["priority_score"],
+        average_score=top_priority["average_score"],
+        trend=top_priority["trend"],
+    )
+
+    task = PracticeTask(
+        learner_id=learner_id,
+        target_skill=top_priority["skill"],
+        practice_type=generated_task.practice_type,
+        difficulty=generated_task.difficulty,
+        title=generated_task.title,
+        instruction=generated_task.instruction,
+        status="pending",
+    )
+
+    db.add(task)
+    db.commit()
+    db.refresh(task)
+
+    return task
