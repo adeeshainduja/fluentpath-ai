@@ -1,66 +1,110 @@
 from sqlalchemy.orm import Session
 
-from app.agents.task_evaluation_agent import (
-    evaluate_task_response,
-)
-from app.models.practice_attempt import PracticeAttempt
 from app.models.practice_task import PracticeTask
 
+from app.services.practice_task_service import (
+    generate_adaptive_practice_task,
+    submit_task_attempt,
+)
 
-def evaluate_linked_practice_task(
+from app.services.task_evaluation_service import (
+    evaluate_linked_practice_task,
+)
+
+
+def start_practice_session(
     db: Session,
-    attempt_id: int,
+    learner_id: int,
 ):
-    # Find the learner attempt
-    attempt = (
-        db.query(PracticeAttempt)
-        .filter(
-            PracticeAttempt.id == attempt_id
-        )
-        .first()
+    task = generate_adaptive_practice_task(
+        db=db,
+        learner_id=learner_id,
     )
 
-    if attempt is None:
-        return {
-            "error": "Practice attempt not found"
-        }
+    if isinstance(task, dict) and "error" in task:
+        return task
 
-    # The attempt must belong to a generated task
-    if attempt.task_id is None:
-        return {
-            "error": (
-                "This attempt is not linked "
-                "to a practice task"
-            )
-        }
+    return {
+        "session_status": "active",
+        "learner_id": learner_id,
+        "task": {
+            "id": task.id,
+            "target_skill": task.target_skill,
+            "practice_type": task.practice_type,
+            "difficulty": task.difficulty,
+            "title": task.title,
+            "instruction": task.instruction,
+            "strategy": task.strategy,
+            "status": task.status,
+        },
+    }
 
-    # Load the linked task
+
+def submit_session_response(
+    db: Session,
+    learner_id: int,
+    task_id: int,
+    text: str,
+):
     task = (
         db.query(PracticeTask)
         .filter(
-            PracticeTask.id == attempt.task_id
+            PracticeTask.id == task_id,
+            PracticeTask.learner_id == learner_id,
         )
         .first()
     )
 
     if task is None:
         return {
-            "error": "Linked practice task not found"
+            "error": (
+                "Practice task not found for this learner"
+            )
         }
 
-    # Ask Gemini to evaluate task completion
-    evaluation = evaluate_task_response(
-        task_instruction=task.instruction,
-        learner_response=attempt.text,
-        target_skill=task.target_skill,
+    attempt = submit_task_attempt(
+        db=db,
+        task_id=task_id,
+        text=text,
     )
 
+    if isinstance(attempt, dict) and "error" in attempt:
+        return attempt
+
+    evaluation_result = evaluate_linked_practice_task(
+        db=db,
+        attempt_id=attempt.id,
+    )
+
+    if (
+        isinstance(evaluation_result, dict)
+        and "error" in evaluation_result
+    ):
+        return evaluation_result
+
+    evaluation = evaluation_result["task_evaluation"]
+
+    if evaluation.completed:
+        task.status = "completed"
+        next_action = "generate_next_task"
+    else:
+        task.status = "retry_required"
+        next_action = "retry_current_task"
+
+    db.commit()
+    db.refresh(task)
+
     return {
-        "attempt_id": attempt.id,
+        "session_status": (
+            "completed"
+            if task.status == "completed"
+            else "active"
+        ),
+        "learner_id": learner_id,
         "task_id": task.id,
-        "task_title": task.title,
-        "task_instruction": task.instruction,
-        "target_skill": task.target_skill,
-        "learner_response": attempt.text,
-        "task_evaluation": evaluation,
+        "attempt_id": attempt.id,
+        "attempt_number": attempt.attempt_number,
+        "task_status": task.status,
+        "evaluation": evaluation_result,
+        "next_action": next_action,
     }
