@@ -3,7 +3,6 @@ from datetime import datetime
 from sqlalchemy import (
     Boolean,
     DateTime,
-    Float,
     ForeignKey,
     Integer,
     String,
@@ -29,12 +28,14 @@ class ProgressMetric(Base):
     )
 
     task_id: Mapped[int] = mapped_column(
+        Integer,
         ForeignKey("practice_tasks.id"),
         nullable=False,
         index=True,
     )
 
     attempt_id: Mapped[int] = mapped_column(
+        Integer,
         ForeignKey("practice_attempts.id"),
         nullable=False,
         unique=True,
@@ -44,6 +45,7 @@ class ProgressMetric(Base):
     target_skill: Mapped[str] = mapped_column(
         String(100),
         nullable=False,
+        index=True,
     )
 
     task_score: Mapped[int] = mapped_column(
