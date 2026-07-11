@@ -31,6 +31,9 @@ from app.api.adaptive_priorities import (
 from app.api.practice_strategies import (
     router as practice_strategies_router,
 )
+from app.api.practice_sessions import (
+    router as practice_sessions_router,
+)
 
 
 app = FastAPI(
@@ -50,6 +53,7 @@ app.include_router(practice_tasks_router)
 app.include_router(progress_comparisons_router)
 app.include_router(adaptive_priorities_router)
 app.include_router(practice_strategies_router)
+app.include_router(practice_sessions_router)
 
 @app.get("/")
 def root():
