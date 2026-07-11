@@ -1,6 +1,5 @@
 from sqlalchemy.orm import Session
 
-from app.models.practice_attempt import PracticeAttempt
 from app.models.practice_task import PracticeTask
 
 from app.services.practice_task_service import (
@@ -9,7 +8,7 @@ from app.services.practice_task_service import (
 )
 
 from app.services.task_evaluation_service import (
-    evaluate_task_attempt,
+    evaluate_linked_practice_task,
 )
 
 
@@ -47,6 +46,10 @@ def submit_session_response(
     task_id: int,
     text: str,
 ):
+    # --------------------------------------------------------
+    # 1. Validate task ownership
+    # --------------------------------------------------------
+
     task = (
         db.query(PracticeTask)
         .filter(
@@ -58,8 +61,14 @@ def submit_session_response(
 
     if task is None:
         return {
-            "error": "Practice task not found for this learner"
+            "error": (
+                "Practice task not found for this learner"
+            )
         }
+
+    # --------------------------------------------------------
+    # 2. Create learner attempt
+    # --------------------------------------------------------
 
     attempt = submit_task_attempt(
         db=db,
@@ -70,7 +79,11 @@ def submit_session_response(
     if isinstance(attempt, dict) and "error" in attempt:
         return attempt
 
-    evaluation_result = evaluate_task_attempt(
+    # --------------------------------------------------------
+    # 3. Evaluate + update task + save metric
+    # --------------------------------------------------------
+
+    evaluation_result = evaluate_linked_practice_task(
         db=db,
         attempt_id=attempt.id,
     )
@@ -81,20 +94,32 @@ def submit_session_response(
     ):
         return evaluation_result
 
-    next_action = "continue"
+    # Refresh because evaluation service changed task status
+    db.refresh(task)
+
+    # --------------------------------------------------------
+    # 4. Decide next action
+    # --------------------------------------------------------
 
     if task.status == "completed":
+        session_status = "completed"
         next_action = "generate_next_task"
 
-    elif task.status == "retry_required":
+    else:
+        session_status = "active"
         next_action = "retry_current_task"
 
+    # --------------------------------------------------------
+    # 5. Return orchestrated result
+    # --------------------------------------------------------
+
     return {
-        "session_status": "active",
+        "session_status": session_status,
         "learner_id": learner_id,
-        "task_id": task_id,
+        "task_id": task.id,
         "attempt_id": attempt.id,
         "attempt_number": attempt.attempt_number,
+        "task_status": task.status,
         "evaluation": evaluation_result,
         "next_action": next_action,
     }

@@ -1,110 +1,137 @@
 from sqlalchemy.orm import Session
 
+from app.agents.task_evaluation_agent import (
+    evaluate_task_response,
+)
+from app.models.practice_attempt import PracticeAttempt
 from app.models.practice_task import PracticeTask
-
-from app.services.practice_task_service import (
-    generate_adaptive_practice_task,
-    submit_task_attempt,
-)
-
-from app.services.task_evaluation_service import (
-    evaluate_linked_practice_task,
+from app.services.progress_metric_service import (
+    save_progress_metric,
 )
 
 
-def start_practice_session(
+def evaluate_linked_practice_task(
     db: Session,
-    learner_id: int,
+    attempt_id: int,
 ):
-    task = generate_adaptive_practice_task(
-        db=db,
-        learner_id=learner_id,
+    # --------------------------------------------------------
+    # 1. Find learner attempt
+    # --------------------------------------------------------
+
+    attempt = (
+        db.query(PracticeAttempt)
+        .filter(
+            PracticeAttempt.id == attempt_id
+        )
+        .first()
     )
 
-    if isinstance(task, dict) and "error" in task:
-        return task
+    if attempt is None:
+        return {
+            "error": "Practice attempt not found"
+        }
 
-    return {
-        "session_status": "active",
-        "learner_id": learner_id,
-        "task": {
-            "id": task.id,
-            "target_skill": task.target_skill,
-            "practice_type": task.practice_type,
-            "difficulty": task.difficulty,
-            "title": task.title,
-            "instruction": task.instruction,
-            "strategy": task.strategy,
-            "status": task.status,
-        },
-    }
+    # --------------------------------------------------------
+    # 2. Check task connection
+    # --------------------------------------------------------
 
+    if attempt.task_id is None:
+        return {
+            "error": (
+                "This attempt is not linked "
+                "to a practice task"
+            )
+        }
 
-def submit_session_response(
-    db: Session,
-    learner_id: int,
-    task_id: int,
-    text: str,
-):
+    # --------------------------------------------------------
+    # 3. Load linked task
+    # --------------------------------------------------------
+
     task = (
         db.query(PracticeTask)
         .filter(
-            PracticeTask.id == task_id,
-            PracticeTask.learner_id == learner_id,
+            PracticeTask.id == attempt.task_id
         )
         .first()
     )
 
     if task is None:
         return {
-            "error": (
-                "Practice task not found for this learner"
-            )
+            "error": "Linked practice task not found"
         }
 
-    attempt = submit_task_attempt(
-        db=db,
-        task_id=task_id,
-        text=text,
+    # --------------------------------------------------------
+    # 4. Evaluate learner response
+    # --------------------------------------------------------
+
+    evaluation = evaluate_task_response(
+        task_instruction=task.instruction,
+        learner_response=attempt.text,
+        target_skill=task.target_skill,
     )
 
-    if isinstance(attempt, dict) and "error" in attempt:
-        return attempt
+    # --------------------------------------------------------
+    # 5. Update task status
+    # --------------------------------------------------------
 
-    evaluation_result = evaluate_linked_practice_task(
-        db=db,
-        attempt_id=attempt.id,
-    )
-
-    if (
-        isinstance(evaluation_result, dict)
-        and "error" in evaluation_result
-    ):
-        return evaluation_result
-
-    evaluation = evaluation_result["task_evaluation"]
-
-    if evaluation.completed:
+    if evaluation.task_completed:
         task.status = "completed"
-        next_action = "generate_next_task"
     else:
         task.status = "retry_required"
-        next_action = "retry_current_task"
 
     db.commit()
     db.refresh(task)
 
-    return {
-        "session_status": (
-            "completed"
-            if task.status == "completed"
-            else "active"
+    # --------------------------------------------------------
+    # 6. Save progress metric
+    # --------------------------------------------------------
+
+    progress_metric = save_progress_metric(
+        db=db,
+        learner_id=attempt.learner_id,
+        task_id=task.id,
+        attempt_id=attempt.id,
+        target_skill=task.target_skill,
+        task_score=evaluation.score,
+        response_text=attempt.text,
+        relevant=evaluation.relevant,
+        sufficient_detail=(
+            evaluation.sufficient_detail
         ),
-        "learner_id": learner_id,
-        "task_id": task.id,
+        target_skill_practiced=(
+            evaluation.target_skill_practiced
+        ),
+    )
+
+    # --------------------------------------------------------
+    # 7. Return complete evaluation result
+    # --------------------------------------------------------
+
+    return {
         "attempt_id": attempt.id,
-        "attempt_number": attempt.attempt_number,
+        "task_id": task.id,
+        "task_title": task.title,
+        "task_instruction": task.instruction,
+        "target_skill": task.target_skill,
+        "learner_response": attempt.text,
         "task_status": task.status,
-        "evaluation": evaluation_result,
-        "next_action": next_action,
+        "task_evaluation": evaluation,
+        "progress_metric": {
+            "id": progress_metric.id,
+            "task_score": (
+                progress_metric.task_score
+            ),
+            "response_length": (
+                progress_metric.response_length
+            ),
+            "relevant": (
+                progress_metric.relevant
+            ),
+            "sufficient_detail": (
+                progress_metric.sufficient_detail
+            ),
+            "target_skill_practiced": (
+                progress_metric.target_skill_practiced
+            ),
+        },
     }
