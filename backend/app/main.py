@@ -61,7 +61,7 @@ from app.api.practice_strategies import (
 from app.api.practice_sessions import (
     router as practice_sessions_router,
 )
-
+from fastapi.middleware.cors import CORSMiddleware
 
 # --------------------------------------------------
 # FastAPI application
@@ -76,7 +76,15 @@ app = FastAPI(
     version="0.1.0",
 )
 
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # --------------------------------------------------
 # Create database tables
 # --------------------------------------------------
