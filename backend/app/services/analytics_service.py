@@ -1,5 +1,7 @@
 from collections import defaultdict
+from sqlalchemy.orm import Session
 
+from app.models.progress_metric import ProgressMetric
 
 def get_skill_progress(
     db: Session,
