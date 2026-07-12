@@ -294,3 +294,82 @@ def get_trend_analytics(
         "lowest_score": min(scores),
         "total_attempts": len(scores),
     }
+
+def get_dashboard_data(
+    db: Session,
+    learner_id: int,
+):
+    """
+    Collect all dashboard sections into a single response.
+    """
+
+    summary = get_dashboard_summary(
+        db=db,
+        learner_id=learner_id,
+    )
+
+    skill_progress = get_skill_progress(
+        db=db,
+        learner_id=learner_id,
+    )
+
+    learning_timeline = get_learning_timeline(
+        db=db,
+        learner_id=learner_id,
+    )
+
+    practice_history = get_practice_history(
+        db=db,
+        learner_id=learner_id,
+    )
+
+    recommendation = determine_practice_strategy(
+        db=db,
+        learner_id=learner_id,
+    )
+
+    error_statistics = get_error_statistics(
+        db=db,
+        learner_id=learner_id,
+    )
+
+    trend_analytics = get_trend_analytics(
+        db=db,
+        learner_id=learner_id,
+    )
+
+    # Keep the API response consistent even when there is
+    # not enough learner data.
+    if not isinstance(recommendation, dict):
+        recommendation = {}
+
+    recommendation.setdefault(
+        "strategy",
+        None,
+    )
+    recommendation.setdefault(
+        "selected_skill",
+        None,
+    )
+    recommendation.setdefault(
+        "reason",
+        None,
+    )
+
+    return {
+        "summary": summary,
+        "skill_progress": skill_progress,
+        "learning_timeline": learning_timeline,
+        "practice_history": practice_history,
+        "recommendations": {
+            "strategy": recommendation.get("strategy"),
+            "priority_skill": recommendation.get(
+                "selected_skill"
+            ),
+            "reason": recommendation.get(
+                "reason"
+            ),
+        },
+        "error_statistics": error_statistics,
+        "trend_analytics": trend_analytics,
+    }
