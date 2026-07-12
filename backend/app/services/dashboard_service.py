@@ -8,7 +8,7 @@ from app.services.adaptive_priority_service import (
     calculate_adaptive_priorities,
 )
 from app.services.practice_strategy_service import (
-    get_next_practice_strategy,
+    determine_practice_strategy,
 )
 
 
@@ -70,7 +70,7 @@ def get_dashboard_summary(
         else "None"
     )
 
-    strategy = get_next_practice_strategy(
+    strategy_result = determine_practice_strategy(
         db=db,
         learner_id=learner_id,
     )
@@ -88,5 +88,5 @@ def get_dashboard_summary(
         "pending_tasks": pending_tasks,
         "learning_trend": trend,
         "recommended_skill": recommended_skill,
-        "recommended_strategy": strategy,
+        "recommended_strategy": strategy_result["strategy"],
     }
