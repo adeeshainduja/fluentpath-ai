@@ -151,3 +151,146 @@ def get_learning_timeline(
         )
 
     return result
+
+def get_practice_history(
+    db: Session,
+    learner_id: int,
+):
+    tasks = (
+        db.query(PracticeTask)
+        .filter(
+            PracticeTask.learner_id == learner_id
+        )
+        .order_by(
+            PracticeTask.created_at.desc()
+        )
+        .limit(10)
+        .all()
+    )
+
+    history = []
+
+    for task in tasks:
+        history.append(
+            {
+                "task_id": task.id,
+                "title": task.title,
+                "target_skill": task.target_skill,
+                "practice_type": task.practice_type,
+                "difficulty": task.difficulty,
+                "status": task.status,
+                "strategy": task.strategy,
+                "created_at": task.created_at,
+            }
+        )
+
+    return history
+
+
+def get_error_statistics(
+    db: Session,
+    learner_id: int,
+):
+    errors = (
+        db.query(ErrorPattern)
+        .filter(
+            ErrorPattern.learner_id == learner_id
+        )
+        .all()
+    )
+
+    distribution = {}
+
+    total_errors = 0
+    active_errors = 0
+    resolved_errors = 0
+
+    for error in errors:
+
+        distribution[error.category] = {
+            "error_type": error.error_type,
+            "occurrences": error.occurrence_count,
+            "resolved": error.resolved_count,
+            "status": error.status,
+        }
+
+        total_errors += error.occurrence_count
+        resolved_errors += error.resolved_count
+
+        active_errors += max(
+            error.occurrence_count
+            - error.resolved_count,
+            0,
+        )
+
+    return {
+        "total_errors": total_errors,
+        "active_errors": active_errors,
+        "resolved_errors": resolved_errors,
+        "error_distribution": distribution,
+    }
+
+
+def get_trend_analytics(
+    db: Session,
+    learner_id: int,
+):
+    metrics = (
+        db.query(ProgressMetric)
+        .filter(
+            ProgressMetric.learner_id == learner_id
+        )
+        .order_by(
+            ProgressMetric.created_at.asc()
+        )
+        .all()
+    )
+
+    if not metrics:
+        return {
+            "trend": "No Data",
+            "average_score": 0,
+            "recent_average": 0,
+            "highest_score": 0,
+            "lowest_score": 0,
+            "total_attempts": 0,
+        }
+
+    scores = [
+        metric.task_score
+        for metric in metrics
+    ]
+
+    average_score = (
+        sum(scores) / len(scores)
+    )
+
+    recent_scores = scores[-5:]
+
+    recent_average = (
+        sum(recent_scores)
+        / len(recent_scores)
+    )
+
+    trend = "Stable"
+
+    if recent_average > average_score:
+        trend = "Improving"
+
+    elif recent_average < average_score:
+        trend = "Declining"
+
+    return {
+        "trend": trend,
+        "average_score": round(
+            average_score,
+            2,
+        ),
+        "recent_average": round(
+            recent_average,
+            2,
+        ),
+        "highest_score": max(scores),
+        "lowest_score": min(scores),
+        "total_attempts": len(scores),
+    }
