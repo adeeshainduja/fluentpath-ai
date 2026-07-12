@@ -8,6 +8,9 @@ from app.models.practice_task import PracticeTask
 from app.services.progress_metric_service import (
     save_progress_metric,
 )
+from app.services.progress_metric_service import (
+    save_progress_metric,
+)
 
 
 def evaluate_linked_practice_task(
