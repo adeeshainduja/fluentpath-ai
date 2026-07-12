@@ -16,7 +16,7 @@ from app.models.error_pattern import ErrorPattern
 from app.models.practice_attempt import PracticeAttempt
 from app.models.practice_task import PracticeTask
 from app.models.progress_metric import ProgressMetric
-
+from app.api.dashboard import router as dashboard_router
 
 # --------------------------------------------------
 # Import API routers
@@ -98,6 +98,7 @@ app.include_router(progress_comparisons_router)
 app.include_router(adaptive_priorities_router)
 app.include_router(practice_strategies_router)
 app.include_router(practice_sessions_router)
+app.include_router(dashboard_router)
 
 
 # --------------------------------------------------
