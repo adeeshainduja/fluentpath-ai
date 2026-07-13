@@ -58,6 +58,13 @@ export interface DailyMission {
   priority: number;
 }
 
+export interface AchievementBadge {
+  title: string;
+  description: string;
+  earned: boolean;
+  icon: string;
+}
+
 export interface DashboardResponse {
   summary: DashboardSummary;
   skill_progress: SkillProgress[];
@@ -68,5 +75,6 @@ export interface DashboardResponse {
   trend_analytics: TrendAnalytics;
   weak_skills: WeakSkill[];
   daily_missions: DailyMission[];
+  achievement_badges: AchievementBadge[];
 
 }
