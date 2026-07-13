@@ -1,30 +1,19 @@
 import { Eye } from "lucide-react";
 
-const history = [
-  {
-    date: "12 Jul",
-    skill: "Grammar",
-    type: "Writing",
-    score: 86,
-    status: "Completed",
-  },
-  {
-    date: "11 Jul",
-    skill: "Vocabulary",
-    type: "Speaking",
-    score: 91,
-    status: "Completed",
-  },
-  {
-    date: "10 Jul",
-    skill: "Fluency",
-    type: "Speaking",
-    score: 79,
-    status: "Completed",
-  },
-];
+interface PracticeItem {
+  task_id: number;
+  target_skill: string;
+  task_score: number;
+  created_at: string;
+}
 
-export default function PracticeHistory() {
+interface PracticeHistoryProps {
+  history: PracticeItem[];
+}
+
+export default function PracticeHistory({
+  history,
+}: PracticeHistoryProps) {
   return (
     <div className="rounded-3xl bg-white p-6 shadow-sm">
       <h2 className="mb-6 text-xl font-bold text-[#3D348B]">
@@ -36,7 +25,7 @@ export default function PracticeHistory() {
           <tr className="border-b text-left text-gray-500">
             <th className="pb-3">Date</th>
             <th className="pb-3">Skill</th>
-            <th className="pb-3">Type</th>
+            <th className="pb-3">Task ID</th>
             <th className="pb-3">Score</th>
             <th className="pb-3">Status</th>
             <th className="pb-3"></th>
@@ -44,23 +33,49 @@ export default function PracticeHistory() {
         </thead>
 
         <tbody>
-          {history.map((item, index) => (
+          {history.map((item) => (
             <tr
-              key={index}
+              key={item.task_id}
               className="border-b last:border-none"
             >
-              <td className="py-4">{item.date}</td>
-              <td>{item.skill}</td>
-              <td>{item.type}</td>
-              <td>{item.score}%</td>
-              <td className="text-green-600">{item.status}</td>
+              <td className="py-4">
+                {new Date(item.created_at).toLocaleDateString()}
+              </td>
+
               <td>
-                <button className="rounded-lg p-2 hover:bg-gray-100">
+                {item.target_skill
+                  .replaceAll("_", " ")
+                  .replace(/\b\w/g, (c) => c.toUpperCase())}
+              </td>
+
+              <td>#{item.task_id}</td>
+
+              <td>{item.task_score}%</td>
+
+              <td>
+                <span className="font-medium text-green-600">
+                  Completed
+                </span>
+              </td>
+
+              <td>
+                <button className="rounded-lg p-2 transition hover:bg-gray-100">
                   <Eye size={18} />
                 </button>
               </td>
             </tr>
           ))}
+
+          {history.length === 0 && (
+            <tr>
+              <td
+                colSpan={6}
+                className="py-8 text-center text-gray-500"
+              >
+                No practice history found.
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>
