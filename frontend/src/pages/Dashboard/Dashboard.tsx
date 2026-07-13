@@ -72,7 +72,7 @@ export default function Dashboard() {
 
       {/* Daily Mission & Achievements */}
       <div className="grid grid-cols-2 gap-8">
-        <DailyMission />
+        <DailyMission missions={data.daily_missions} />
         <AchievementBadges />
       </div>
       <WeakSkills skills={data.weak_skills} />
