@@ -75,7 +75,7 @@ export default function Dashboard() {
         <DailyMission />
         <AchievementBadges />
       </div>
-      <WeakSkills />
+      <WeakSkills skills={data.weak_skills} />
     </div>
   );
 }

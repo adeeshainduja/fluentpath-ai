@@ -1,22 +1,13 @@
-import {
-  AlertTriangle,
-  ArrowRight,
-} from "lucide-react";
+import { AlertTriangle, ArrowRight } from "lucide-react";
+import type { WeakSkill } from "../../types/dashboard";
 
-const weakSkills = [
-  {
-    skill: "Grammar",
-    score: 58,
-    advice: "Practice Past Tense exercises.",
-  },
-  {
-    skill: "Pronunciation",
-    score: 63,
-    advice: "Complete Speaking Challenge.",
-  },
-];
+interface WeakSkillsProps {
+  skills: WeakSkill[];
+}
 
-export default function WeakSkills() {
+export default function WeakSkills({
+  skills,
+}: WeakSkillsProps) {
   return (
     <div className="rounded-3xl bg-white p-6 shadow-sm">
       <div className="flex items-center gap-3">
@@ -31,7 +22,7 @@ export default function WeakSkills() {
       </div>
 
       <div className="mt-6 space-y-5">
-        {weakSkills.map((item) => (
+        {skills.map((item) => (
           <div
             key={item.skill}
             className="rounded-2xl border border-gray-200 p-5"
@@ -47,12 +38,15 @@ export default function WeakSkills() {
             </div>
 
             <p className="mt-3 text-gray-500">
-              {item.advice}
+              {item.recommendation}
             </p>
 
-            <button className="mt-4 flex items-center gap-2 font-semibold text-[#3D348B]">
-              Practice Now
+            <span className="mt-3 inline-block rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-700">
+              {item.priority} Priority
+            </span>
 
+            <button className="mt-5 flex items-center gap-2 font-semibold text-[#3D348B]">
+              Practice Now
               <ArrowRight size={18} />
             </button>
           </div>

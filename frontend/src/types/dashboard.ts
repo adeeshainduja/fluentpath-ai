@@ -44,6 +44,13 @@ export interface Recommendation {
   reason: string;
 }
 
+export interface WeakSkill {
+  skill: string;
+  score: number;
+  priority: string;
+  recommendation: string;
+}
+
 export interface DashboardResponse {
   summary: DashboardSummary;
   skill_progress: SkillProgress[];
@@ -52,4 +59,6 @@ export interface DashboardResponse {
   recommendations: Recommendation;
   error_statistics: ErrorStatistics;
   trend_analytics: TrendAnalytics;
+  weak_skills: WeakSkill[];
+
 }

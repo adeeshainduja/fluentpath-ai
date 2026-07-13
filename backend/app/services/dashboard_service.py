@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.models.error_pattern import ErrorPattern
 from app.models.practice_task import PracticeTask
 from app.models.progress_metric import ProgressMetric
+from app.services.weak_skills_service import get_weak_skills
 
 from app.services.adaptive_priority_service import (
     calculate_adaptive_priorities,
@@ -372,4 +373,5 @@ def get_dashboard_data(
         },
         "error_statistics": error_statistics,
         "trend_analytics": trend_analytics,
+        "weak_skills": get_weak_skills(db, learner_id),
     }
