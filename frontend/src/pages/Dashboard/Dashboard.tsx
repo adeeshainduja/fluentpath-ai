@@ -6,6 +6,9 @@ import GoalCard from "../../components/dashboard/GoalCard";
 import ProgressChart from "../../components/dashboard/ProgressChart";
 import SkillRadar from "../../components/dashboard/SkillRadar";
 import PracticeHistory from "../../components/dashboard/PracticeHistory";
+import DailyMission from "../../components/dashboard/DailyMission";
+import AchievementBadges from "../../components/dashboard/AchievementBadges";
+import WeakSkills from "../../components/dashboard/WeakSkills";
 
 export default function Dashboard() {
   const { data, isLoading, error } = useDashboard(1);
@@ -66,6 +69,13 @@ export default function Dashboard() {
 
       {/* Practice History */}
       <PracticeHistory history={data.practice_history} />
+
+      {/* Daily Mission & Achievements */}
+      <div className="grid grid-cols-2 gap-8">
+        <DailyMission />
+        <AchievementBadges />
+      </div>
+      <WeakSkills />
     </div>
   );
 }
