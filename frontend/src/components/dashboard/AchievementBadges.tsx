@@ -1,38 +1,51 @@
-import { Trophy } from "lucide-react";
+import { Award, Flame, Star } from "lucide-react";
 
-export default function AchievementCard() {
+const badges = [
+  {
+    title: "7 Day Streak",
+    icon: Flame,
+    color: "text-orange-500",
+  },
+  {
+    title: "Grammar Master",
+    icon: Award,
+    color: "text-blue-500",
+  },
+  {
+    title: "Top Performer",
+    icon: Star,
+    color: "text-yellow-500",
+  },
+];
+
+export default function AchievementBadges() {
   return (
     <div className="rounded-3xl bg-white p-6 shadow-sm">
-      <div className="flex items-center gap-3">
-        <Trophy className="text-yellow-500" />
+      <h2 className="text-xl font-bold text-[#3D348B]">
+        Achievements
+      </h2>
 
-        <h2 className="text-xl font-bold text-[#3D348B]">
-          Achievements
-        </h2>
-      </div>
+      <div className="mt-6 grid grid-cols-3 gap-4">
 
-      <div className="mt-6 flex gap-4">
+        {badges.map((badge) => {
+          const Icon = badge.icon;
 
-        <div className="rounded-xl bg-[#D0E6FF] p-4 text-center">
-          🔥
-          <p className="mt-2 text-sm">
-            7 Day Streak
-          </p>
-        </div>
+          return (
+            <div
+              key={badge.title}
+              className="rounded-2xl border p-5 text-center hover:shadow-md"
+            >
+              <Icon
+                size={40}
+                className={`mx-auto ${badge.color}`}
+              />
 
-        <div className="rounded-xl bg-[#D0E6FF] p-4 text-center">
-          🏆
-          <p className="mt-2 text-sm">
-            Grammar Master
-          </p>
-        </div>
-
-        <div className="rounded-xl bg-[#D0E6FF] p-4 text-center">
-          🚀
-          <p className="mt-2 text-sm">
-            Top Progress
-          </p>
-        </div>
+              <p className="mt-3 text-sm font-semibold">
+                {badge.title}
+              </p>
+            </div>
+          );
+        })}
 
       </div>
     </div>

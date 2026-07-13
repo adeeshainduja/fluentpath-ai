@@ -6,16 +6,25 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const data = [
-  { skill: "Grammar", score: 78 },
-  { skill: "Vocabulary", score: 90 },
-  { skill: "Pronunciation", score: 70 },
-  { skill: "Fluency", score: 82 },
-  { skill: "Listening", score: 75 },
-  { skill: "Writing", score: 88 },
-];
+interface SkillProgress {
+  skill: string;
+  average_score: number;
+}
 
-export default function SkillRadar() {
+interface SkillRadarProps {
+  skills: SkillProgress[];
+}
+
+export default function SkillRadar({
+  skills,
+}: SkillRadarProps) {
+  const radarData = skills.map((item) => ({
+    skill: item.skill
+      .replaceAll("_", " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase()),
+    score: item.average_score,
+  }));
+
   return (
     <div className="rounded-3xl bg-white p-6 shadow-sm">
       <div className="mb-6">
@@ -29,7 +38,7 @@ export default function SkillRadar() {
       </div>
 
       <ResponsiveContainer width="100%" height={320}>
-        <RadarChart data={data}>
+        <RadarChart data={radarData}>
           <PolarGrid />
 
           <PolarAngleAxis dataKey="skill" />

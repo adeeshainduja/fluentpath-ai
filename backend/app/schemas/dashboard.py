@@ -68,6 +68,12 @@ class TrendAnalytics(BaseModel):
     lowest_score: int
     total_attempts: int
 
+class WeakSkill(BaseModel):
+    skill: str
+    score: float
+    priority: str
+    recommendation: str
+
 
 class DashboardResponse(BaseModel):
     summary: DashboardSummary
@@ -77,3 +83,4 @@ class DashboardResponse(BaseModel):
     recommendations: Recommendation
     error_statistics: ErrorStatistics
     trend_analytics: TrendAnalytics
+    weak_skills: List[WeakSkill]

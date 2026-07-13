@@ -8,17 +8,26 @@ import {
   YAxis,
 } from "recharts";
 
-const data = [
-  { day: "Mon", score: 62 },
-  { day: "Tue", score: 70 },
-  { day: "Wed", score: 68 },
-  { day: "Thu", score: 78 },
-  { day: "Fri", score: 84 },
-  { day: "Sat", score: 90 },
-  { day: "Sun", score: 88 },
-];
+interface TimelineItem {
+  date: string;
+  practice_count: number;
+  average_score: number;
+}
 
-export default function ProgressChart() {
+interface ProgressChartProps {
+  timeline: TimelineItem[];
+}
+
+export default function ProgressChart({
+  timeline,
+}: ProgressChartProps) {
+  const chartData = timeline.map((item) => ({
+    day: new Date(item.date).toLocaleDateString("en-US", {
+      weekday: "short",
+    }),
+    score: item.average_score,
+  }));
+
   return (
     <div className="rounded-3xl bg-white p-6 shadow-sm">
       <div className="mb-6">
@@ -32,11 +41,25 @@ export default function ProgressChart() {
       </div>
 
       <ResponsiveContainer width="100%" height={320}>
-        <AreaChart data={data}>
+        <AreaChart data={chartData}>
           <defs>
-            <linearGradient id="score" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#4CB1FF" stopOpacity={0.8} />
-              <stop offset="95%" stopColor="#4CB1FF" stopOpacity={0.05} />
+            <linearGradient
+              id="score"
+              x1="0"
+              y1="0"
+              x2="0"
+              y2="1"
+            >
+              <stop
+                offset="5%"
+                stopColor="#4CB1FF"
+                stopOpacity={0.8}
+              />
+              <stop
+                offset="95%"
+                stopColor="#4CB1FF"
+                stopOpacity={0.05}
+              />
             </linearGradient>
           </defs>
 
@@ -44,7 +67,7 @@ export default function ProgressChart() {
 
           <XAxis dataKey="day" />
 
-          <YAxis />
+          <YAxis domain={[0, 100]} />
 
           <Tooltip />
 
