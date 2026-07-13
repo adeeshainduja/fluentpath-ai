@@ -74,6 +74,12 @@ class WeakSkill(BaseModel):
     priority: str
     recommendation: str
 
+class DailyMission(BaseModel):
+    skill: str
+    target: int
+    completed: int
+    priority: float
+
 
 class DashboardResponse(BaseModel):
     summary: DashboardSummary
@@ -84,3 +90,4 @@ class DashboardResponse(BaseModel):
     error_statistics: ErrorStatistics
     trend_analytics: TrendAnalytics
     weak_skills: List[WeakSkill]
+    daily_missions: List[DailyMission]
