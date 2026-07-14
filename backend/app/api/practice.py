@@ -8,6 +8,9 @@ from app.schemas.practice import (
     RetryAttemptCreate,
 )
 from app.memory.learner_memory import get_learner_weaknesses
+from app.services.practice_detail_service import (
+    get_practice_detail,
+)
 
 router = APIRouter(
     prefix="/api/v1/practice",
@@ -113,3 +116,21 @@ def get_weaknesses(
     )
 
     return weaknesses
+
+@router.get("/{task_id}")
+def get_practice(
+    task_id: int,
+    db: Session = Depends(get_db),
+):
+    task = get_practice_detail(
+        db=db,
+        task_id=task_id,
+    )
+
+    if task is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Practice not found",
+        )
+
+    return task

@@ -12,7 +12,21 @@ export default function PracticeDetail() {
 
   if (loading) return <h1>Loading...</h1>;
 
-  if (error) return <h1>Error loading practice.</h1>;
+ if (error) {
+  console.log(error);
+
+  return (
+    <div className="p-8">
+      <h1 className="text-red-600 text-xl">
+        Error loading practice
+      </h1>
+
+      <pre className="mt-4">
+        {JSON.stringify(error, null, 2)}
+      </pre>
+    </div>
+  );
+}
 
   return (
     <div className="space-y-8">
