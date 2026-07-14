@@ -5,124 +5,189 @@ import SkillRadarChart from "../../components/analytics/SkillRadarChart";
 import ProgressTrendChart from "../../components/analytics/ProgressTrendChart";
 import WeakSkillsCard from "../../components/analytics/WeakSkillsCard";
 import RecommendationCard from "../../components/analytics/RecommendationCard";
+import WeeklyActivityChart from "../../components/analytics/WeeklyActivityChart";
+import ErrorStatisticsCard from "../../components/analytics/ErrorStatisticsCard";
+import PracticeHistoryTable from "../../components/analytics/PracticeHistoryTable";
 
 export default function Analytics() {
-  // Temporary dummy data
   const overallScore = 82;
 
-  const skillScores = {
+  const skills = {
     grammar: 80,
     vocabulary: 72,
     fluency: 88,
     pronunciation: 65,
   };
-    const progressData = [
-    { date: "Mon", score: 68 },
-    { date: "Tue", score: 72 },
-    { date: "Wed", score: 75 },
-    { date: "Thu", score: 79 },
-    { date: "Fri", score: 82 },
-    { date: "Sat", score: 84 },
-    { date: "Sun", score: 87 },
-    ];
-    const weakSkills = [
+
+  const progressData = [
     {
-        skill: "Vocabulary",
-        score: 72,
-        recommendation:
-        "Practice advanced vocabulary exercises.",
-        priority: "High",
+      date: "Mon",
+      score: 68,
     },
     {
-        skill: "Pronunciation",
-        score: 65,
-        recommendation:
-        "Complete speaking practice sessions.",
-        priority: "Medium",
+      date: "Tue",
+      score: 72,
     },
-    ];
-    const recommendation = {
-    strategy: "Vocabulary Practice",
+    {
+      date: "Wed",
+      score: 76,
+    },
+    {
+      date: "Thu",
+      score: 80,
+    },
+    {
+      date: "Fri",
+      score: 82,
+    },
+    {
+      date: "Sat",
+      score: 85,
+    },
+    {
+      date: "Sun",
+      score: 88,
+    },
+  ];
+
+  const weakSkills = [
+    {
+      skill: "Vocabulary",
+      score: 72,
+      recommendation:
+        "Practice advanced vocabulary exercises every day.",
+      priority: "High",
+    },
+    {
+      skill: "Pronunciation",
+      score: 65,
+      recommendation:
+        "Complete speaking practice sessions with AI feedback.",
+      priority: "Medium",
+    },
+  ];
+
+  const recommendation = {
     priority_skill: "Vocabulary",
+    strategy: "Vocabulary Practice",
     reason:
-        "Vocabulary has been consistently below your grammar and fluency scores over the last five sessions.",
-    };
-    
+      "Vocabulary performance has consistently been lower than grammar and fluency.",
+  };
+
+  const weeklyActivity = [
+    {
+      day: "Mon",
+      score: 70,
+    },
+    {
+      day: "Tue",
+      score: 90,
+    },
+    {
+      day: "Wed",
+      score: 55,
+    },
+    {
+      day: "Thu",
+      score: 85,
+    },
+    {
+      day: "Fri",
+      score: 78,
+    },
+    {
+      day: "Sat",
+      score: 95,
+    },
+    {
+      day: "Sun",
+      score: 88,
+    },
+  ];
+
+  const history = [
+    {
+      date: "14 Jul",
+      skill: "Grammar",
+      score: 90,
+      status: "Completed",
+    },
+    {
+      date: "13 Jul",
+      skill: "Vocabulary",
+      score: 84,
+      status: "Completed",
+    },
+    {
+      date: "12 Jul",
+      skill: "Speaking",
+      score: 81,
+      status: "Completed",
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-slate-100 p-8">
-      <div className="mx-auto max-w-7xl space-y-8">
+    <div className="min-h-screen bg-slate-100">
+      <div className="mx-auto max-w-7xl space-y-8 p-8">
+
         <AnalyticsHeader />
 
-        <OverallScoreCard score={overallScore} />
+        <OverallScoreCard
+          score={overallScore}
+        />
 
         <StatsGrid
-          grammar={skillScores.grammar}
-          vocabulary={skillScores.vocabulary}
-          fluency={skillScores.fluency}
-          pronunciation={skillScores.pronunciation}
-        />
-        <div className="grid gap-6 lg:grid-cols-2">
-        <SkillRadarChart
-            grammar={80}
-            vocabulary={72}
-            fluency={88}
-            pronunciation={65}
+          grammar={skills.grammar}
+          vocabulary={skills.vocabulary}
+          fluency={skills.fluency}
+          pronunciation={skills.pronunciation}
         />
 
-        <div className="rounded-3xl bg-white p-6 shadow-sm flex items-center justify-center">
-            <p className="text-gray-400">
-            Progress Trend Chart (Coming Next)
-            </p>
-        </div>
-        </div>
         <div className="grid gap-6 lg:grid-cols-2">
-        <SkillRadarChart
-            grammar={80}
-            vocabulary={72}
-            fluency={88}
-            pronunciation={65}
-        />
 
-        <ProgressTrendChart
+          <SkillRadarChart
+            grammar={skills.grammar}
+            vocabulary={skills.vocabulary}
+            fluency={skills.fluency}
+            pronunciation={skills.pronunciation}
+          />
+
+          <ProgressTrendChart
             data={progressData}
-        />
-        </div>
-        <div className="grid gap-6 lg:grid-cols-2">
-        <WeakSkillsCard skills={weakSkills} />
+          />
 
-        <div className="rounded-3xl bg-white p-6 shadow-sm flex items-center justify-center">
-            <p className="text-gray-400">
-            AI Recommendation Card (Coming Next)
-            </p>
         </div>
-        </div>
-        <div className="grid gap-6 lg:grid-cols-2">
-        <WeakSkillsCard skills={weakSkills} />
 
-        <RecommendationCard
+        <div className="grid gap-6 lg:grid-cols-2">
+
+          <WeakSkillsCard
+            skills={weakSkills}
+          />
+
+          <RecommendationCard
             recommendation={recommendation}
+          />
+
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-2">
+
+          <WeeklyActivityChart
+            days={weeklyActivity}
+          />
+
+          <ErrorStatisticsCard
+            totalErrors={48}
+            resolvedErrors={32}
+            activeErrors={16}
+          />
+
+        </div>
+
+        <PracticeHistoryTable
+          history={history}
         />
-        </div>
 
-        {/* Next components will be added here */}
-
-        {/*
-        <SkillRadarChart />
-
-        <ProgressTrendChart />
-
-        <div className="grid gap-6 lg:grid-cols-2">
-            <WeakSkillsCard />
-            <RecommendationCard />
-        </div>
-
-        <div className="grid gap-6 lg:grid-cols-2">
-            <WeeklyActivityChart />
-            <ErrorStatisticsCard />
-        </div>
-
-        <PracticeHistoryTable />
-        */}
       </div>
     </div>
   );

@@ -6,7 +6,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-interface SkillRadarChartProps {
+interface Props {
   grammar: number;
   vocabulary: number;
   fluency: number;
@@ -18,7 +18,7 @@ export default function SkillRadarChart({
   vocabulary,
   fluency,
   pronunciation,
-}: SkillRadarChartProps) {
+}: Props) {
   const data = [
     {
       skill: "Grammar",
@@ -46,13 +46,13 @@ export default function SkillRadarChart({
         </h2>
 
         <p className="text-gray-500">
-          Performance across English communication skills.
+          Performance across English skills.
         </p>
       </div>
 
       <ResponsiveContainer
         width="100%"
-        height={350}
+        height={340}
       >
         <RadarChart data={data}>
           <PolarGrid />
