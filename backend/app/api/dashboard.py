@@ -7,7 +7,7 @@ from app.schemas.dashboard import DashboardResponse
 from app.services.dashboard_service import get_dashboard_data
 
 router = APIRouter(
-    prefix="/dashboard",
+    prefix="/api/v1/dashboard",
     tags=["Dashboard"],
 )
 

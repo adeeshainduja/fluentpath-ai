@@ -1,3 +1,5 @@
+from unittest import result
+
 from sqlalchemy.orm import Session
 
 from app.models.progress_metric import ProgressMetric
@@ -20,16 +22,23 @@ def save_progress_metric(
     """
 
     metric = ProgressMetric(
-        learner_id=learner_id,
-        task_id=task_id,
-        attempt_id=attempt_id,
-        target_skill=target_skill,
-        task_score=task_score,
-        response_length=len(response_text),
-        relevant=relevant,
-        sufficient_detail=sufficient_detail,
-        target_skill_practiced=target_skill_practiced,
-    )
+    learner_id=learner_id,
+    task_id=task.id,
+    attempt_id=attempt.id,
+    target_skill=task.target_skill,
+
+    task_score=result["overall_score"],
+
+    grammar_score=result["grammar"],
+    vocabulary_score=result["vocabulary"],
+    fluency_score=result["fluency"],
+    pronunciation_score=result["pronunciation"],
+
+    response_length=len(answer),
+    relevant=result["relevant"],
+    sufficient_detail=result["sufficient_detail"],
+    target_skill_practiced=result["target_skill_practiced"],
+)
 
     db.add(metric)
     db.commit()
