@@ -1,11 +1,3 @@
-import {
-  Card,
-  CardContent,
-  LinearProgress,
-  Stack,
-  Typography,
-} from "@mui/material";
-
 interface OverallScoreCardProps {
   score: number;
 }
@@ -14,46 +6,37 @@ export default function OverallScoreCard({
   score,
 }: OverallScoreCardProps) {
   return (
-    <Card
-      elevation={2}
-      sx={{
-        borderRadius: 4,
-      }}
-    >
-      <CardContent>
-        <Stack spacing={2}>
-          <Typography
-            variant="h6"
-            fontWeight={600}
-          >
+    <div className="rounded-3xl bg-white p-8 shadow-sm">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-gray-500">
             Overall English Score
-          </Typography>
+          </p>
 
-          <Typography
-            variant="h2"
-            color="primary"
-            fontWeight={700}
-          >
+          <h2 className="mt-2 text-6xl font-bold text-[#3D348B]">
+            {score}%
+          </h2>
+        </div>
+
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-blue-50">
+          <span className="text-2xl font-bold text-[#3D348B]">
             {score}
-          </Typography>
+          </span>
+        </div>
+      </div>
 
-          <LinearProgress
-            variant="determinate"
-            value={score}
-            sx={{
-              height: 10,
-              borderRadius: 5,
-            }}
-          />
+      <div className="mt-8 h-3 w-full rounded-full bg-gray-200">
+        <div
+          className="h-3 rounded-full bg-gradient-to-r from-[#3D348B] to-[#4CB1FF] transition-all duration-700"
+          style={{
+            width: `${score}%`,
+          }}
+        />
+      </div>
 
-          <Typography
-            variant="body2"
-            color="text.secondary"
-          >
-            Your overall performance across all completed practice sessions.
-          </Typography>
-        </Stack>
-      </CardContent>
-    </Card>
+      <p className="mt-4 text-sm text-gray-500">
+        Your overall performance across all completed practice sessions.
+      </p>
+    </div>
   );
 }
