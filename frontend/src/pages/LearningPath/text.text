@@ -1,0 +1,152 @@
+src/
+│
+├── pages/
+│   └── LearningPath/
+│       ├── LearningPath.tsx
+│       ├── LearningPath.css
+│
+├── components/
+│   └── learningPath/
+│       ├── ProgressCard.tsx
+│       ├── LearningRoadmap.tsx
+│       ├── RoadmapNode.tsx
+│       ├── CurrentTaskCard.tsx
+│       ├── AICoachCard.tsx
+│       ├── StreakCard.tsx
+│       ├── BadgeCard.tsx
+│       └── RecommendationCard.tsx
+│
+├── hooks/
+│   └── useLearningPath.ts
+│
+├── services/
+│   └── learningPathApi.ts
+│
+└── types/
+    └── learningPath.ts
+
+
+    Learning Path Module Roadmap
+Step 1 ✅ (Today)
+
+Create the frontend structure.
+
+src/
+
+pages/
+    LearningPath/
+        LearningPath.tsx
+        LearningPath.css
+
+components/
+    learningPath/
+
+        ProgressOverview.tsx
+        Roadmap.tsx
+        RoadmapItem.tsx
+        CurrentLesson.tsx
+        CoachPanel.tsx
+        StreakCard.tsx
+        BadgeSection.tsx
+Step 2
+
+Create the TypeScript models.
+
+types/
+
+learningPath.ts
+export interface LearningStage {
+  id: number;
+  title: string;
+  skill: string;
+  difficulty: string;
+  status: "completed" | "current" | "locked";
+  estimatedMinutes: number;
+}
+
+export interface LearningPathResponse {
+  overall_progress: number;
+  streak: number;
+  coach_message: string;
+  roadmap: LearningStage[];
+}
+Step 3
+
+Create the API service.
+
+services/
+
+learningPathApi.ts
+Step 4
+
+Create the custom hook.
+
+hooks/
+
+useLearningPath.ts
+Step 5
+
+Build the page layout.
+
+-------------------------------------------------
+
+Personalized Learning Path
+
+Overall Progress
+
+Roadmap
+
+Current Lesson
+
+AI Coach
+
+Badges
+
+Streak
+
+-------------------------------------------------
+Step 6
+
+Connect to backend.
+
+GET
+
+/api/v1/learning-path/1
+Step 7
+
+Replace mock data with API data.
+
+UI Layout
++-------------------------------------------------------------+
+| Personalized Learning Path                     🔥 5 Day      |
++-------------------------------------------------------------+
+
++---------------------------+-------------------------------+
+| Overall Progress          | AI Coach                     |
+|                           | Grammar improved 12%         |
+| ████████████░░░░          | Focus on Vocabulary          |
++---------------------------+-------------------------------+
+
++-------------------------------------------------------------+
+|                 Learning Roadmap                            |
+|                                                             |
+| ✓ Grammar Basics                                            |
+|      │                                                      |
+| ✓ Vocabulary Basics                                         |
+|      │                                                      |
+| ✓ Sentence Construction                                     |
+|      │                                                      |
+| 🔵 Business Email Writing                                   |
+|      │                                                      |
+| 🔒 Listening Skills                                         |
+|      │                                                      |
+| 🔒 Speaking Confidence                                      |
+|      │                                                      |
+| 🔒 Mock Interview                                           |
++-------------------------------------------------------------+
+
++----------------------+------------------------+
+| Current Lesson       | Badges                |
+|                      | 🏆 Grammar Master      |
+| Start Practice       | 🏆 7 Day Streak        |
++----------------------+------------------------+
