@@ -1,6 +1,7 @@
 import AnalyticsHeader from "../../components/analytics/AnalyticsHeader";
 import OverallScoreCard from "../../components/analytics/OverallScoreCard";
 import StatsGrid from "../../components/analytics/StatsGrid";
+import SkillRadarChart from "../../components/analytics/SkillRadarChart";
 
 export default function Analytics() {
   // Temporary dummy data
@@ -26,6 +27,20 @@ export default function Analytics() {
           fluency={skillScores.fluency}
           pronunciation={skillScores.pronunciation}
         />
+        <div className="grid gap-6 lg:grid-cols-2">
+        <SkillRadarChart
+            grammar={80}
+            vocabulary={72}
+            fluency={88}
+            pronunciation={65}
+        />
+
+        <div className="rounded-3xl bg-white p-6 shadow-sm flex items-center justify-center">
+            <p className="text-gray-400">
+            Progress Trend Chart (Coming Next)
+            </p>
+        </div>
+        </div>
 
         {/* Next components will be added here */}
 
