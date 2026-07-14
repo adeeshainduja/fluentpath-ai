@@ -1,15 +1,13 @@
 from pydantic import BaseModel
 
 
-class PracticeSubmissionRequest(BaseModel):
-    answer: str
-
-
 class PracticeSubmissionResponse(BaseModel):
-    score: float
+    score: int
     feedback: str
-    grammar_score: float
-    vocabulary_score: float
-    fluency_score: float
-    pronunciation_score: float | None = None
-    suggestions: list[str] = []
+
+    grammar_score: int
+    vocabulary_score: int
+    fluency_score: int
+    pronunciation_score: int | None = None
+
+    suggestions: list[str]
