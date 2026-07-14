@@ -9,122 +9,81 @@ import WeeklyActivityChart from "../../components/analytics/WeeklyActivityChart"
 import ErrorStatisticsCard from "../../components/analytics/ErrorStatisticsCard";
 import PracticeHistoryTable from "../../components/analytics/PracticeHistoryTable";
 
+import { useDashboard } from "../../hooks/useDashboard";
+
 export default function Analytics() {
-  const overallScore = 82;
+  const learnerId = 1;
 
-  const skills = {
-    grammar: 80,
-    vocabulary: 72,
-    fluency: 88,
-    pronunciation: 65,
-  };
+  const {
+    data,
+    isLoading,
+    error,
+  } = useDashboard(learnerId);
 
-  const progressData = [
-    {
-      date: "Mon",
-      score: 68,
-    },
-    {
-      date: "Tue",
-      score: 72,
-    },
-    {
-      date: "Wed",
-      score: 76,
-    },
-    {
-      date: "Thu",
-      score: 80,
-    },
-    {
-      date: "Fri",
-      score: 82,
-    },
-    {
-      date: "Sat",
-      score: 85,
-    },
-    {
-      date: "Sun",
-      score: 88,
-    },
-  ];
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        Loading analytics...
+      </div>
+    );
+  }
 
-  const weakSkills = [
-    {
-      skill: "Vocabulary",
-      score: 72,
-      recommendation:
-        "Practice advanced vocabulary exercises every day.",
-      priority: "High",
-    },
-    {
-      skill: "Pronunciation",
-      score: 65,
-      recommendation:
-        "Complete speaking practice sessions with AI feedback.",
-      priority: "Medium",
-    },
-  ];
+  if (error || !data) {
+    return (
+      <div className="flex h-screen items-center justify-center text-red-500">
+        Failed to load analytics.
+      </div>
+    );
+  }
 
-  const recommendation = {
-    priority_skill: "Vocabulary",
-    strategy: "Vocabulary Practice",
-    reason:
-      "Vocabulary performance has consistently been lower than grammar and fluency.",
-  };
+  const getSkillScore = (skill: string) =>
+    data.skill_progress.find(
+      (item: { skill: string; }) =>
+        item.skill.toLowerCase() ===
+        skill.toLowerCase()
+    )?.average_score ?? 0;
 
-  const weeklyActivity = [
-    {
-      day: "Mon",
-      score: 70,
-    },
-    {
-      day: "Tue",
-      score: 90,
-    },
-    {
-      day: "Wed",
-      score: 55,
-    },
-    {
-      day: "Thu",
-      score: 85,
-    },
-    {
-      day: "Fri",
-      score: 78,
-    },
-    {
-      day: "Sat",
-      score: 95,
-    },
-    {
-      day: "Sun",
-      score: 88,
-    },
-  ];
+  const progressData =
+    data.learning_timeline.map(
+      (item: { date: string; average_score: number }) => ({
+        date: item.date,
+        score: item.average_score,
+      })
+    );
 
-  const history = [
-    {
-      date: "14 Jul",
-      skill: "Grammar",
-      score: 90,
-      status: "Completed",
-    },
-    {
-      date: "13 Jul",
-      skill: "Vocabulary",
-      score: 84,
-      status: "Completed",
-    },
-    {
-      date: "12 Jul",
-      skill: "Speaking",
-      score: 81,
-      status: "Completed",
-    },
-  ];
+  const weeklyActivity =
+    data.learning_timeline.map(
+      (item: { date: string; average_score: number }) => ({
+        day: new Date(
+          item.date
+        ).toLocaleDateString(
+          "en-US",
+          {
+            weekday: "short",
+          }
+        ),
+        score: item.average_score,
+      })
+    );
+
+  const history =
+    data.practice_history.map(
+      (item: { created_at: string; target_skill: string; task_score: number | undefined; status: string | undefined }) => ({
+        date: new Date(
+          item.created_at
+        ).toLocaleDateString(),
+
+        skill:
+          item.target_skill,
+
+        score:
+          item.task_score ?? 0,
+
+        status:
+          item.status ??
+          "Completed",
+      })
+    );
 
   return (
     <div className="min-h-screen bg-slate-100">
@@ -133,23 +92,41 @@ export default function Analytics() {
         <AnalyticsHeader />
 
         <OverallScoreCard
-          score={overallScore}
+          score={
+            data.summary.average_score
+          }
         />
 
         <StatsGrid
-          grammar={skills.grammar}
-          vocabulary={skills.vocabulary}
-          fluency={skills.fluency}
-          pronunciation={skills.pronunciation}
+          grammar={getSkillScore(
+            "Grammar"
+          )}
+          vocabulary={getSkillScore(
+            "Vocabulary"
+          )}
+          fluency={getSkillScore(
+            "Fluency"
+          )}
+          pronunciation={getSkillScore(
+            "Pronunciation"
+          )}
         />
 
         <div className="grid gap-6 lg:grid-cols-2">
 
           <SkillRadarChart
-            grammar={skills.grammar}
-            vocabulary={skills.vocabulary}
-            fluency={skills.fluency}
-            pronunciation={skills.pronunciation}
+            grammar={getSkillScore(
+              "Grammar"
+            )}
+            vocabulary={getSkillScore(
+              "Vocabulary"
+            )}
+            fluency={getSkillScore(
+              "Fluency"
+            )}
+            pronunciation={getSkillScore(
+              "Pronunciation"
+            )}
           />
 
           <ProgressTrendChart
@@ -157,15 +134,25 @@ export default function Analytics() {
           />
 
         </div>
-
-        <div className="grid gap-6 lg:grid-cols-2">
+                <div className="grid gap-6 lg:grid-cols-2">
 
           <WeakSkillsCard
-            skills={weakSkills}
+            skills={data.weak_skills}
           />
 
           <RecommendationCard
-            recommendation={recommendation}
+            recommendation={{
+              priority_skill:
+                data.recommendations.priority_skill ??
+                data.recommendations.selected_skill ??
+                "General",
+
+              strategy:
+                data.recommendations.strategy,
+
+              reason:
+                data.recommendations.reason,
+            }}
           />
 
         </div>
@@ -177,9 +164,17 @@ export default function Analytics() {
           />
 
           <ErrorStatisticsCard
-            totalErrors={48}
-            resolvedErrors={32}
-            activeErrors={16}
+            totalErrors={
+              data.error_statistics.total_errors
+            }
+            resolvedErrors={
+              data.error_statistics.resolved_errors ??
+              0
+            }
+            activeErrors={
+              data.error_statistics.active_errors ??
+              0
+            }
           />
 
         </div>

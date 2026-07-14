@@ -9,7 +9,11 @@ export interface DashboardSummary {
 
 export interface SkillProgress {
   skill: string;
+  total_attempts: number;
   average_score: number;
+  first_score: number;
+  latest_score: number;
+  score_change: number;
   trend: string;
 }
 
@@ -19,28 +23,22 @@ export interface TimelineItem {
   average_score: number;
 }
 
-export interface PracticeHistory {
+export interface PracticeHistoryItem {
   task_id: number;
-  task_type: string;
-  difficulty: string;
-  status: string;
+  title?: string;
+  target_skill: string;
+  practice_type?: string;
+  difficulty?: string;
+  status?: string;
+  strategy?: string;
+  task_score?: number;
   created_at: string;
-}
-
-export interface ErrorStatistics {
-  total_errors: number;
-  error_distribution: Record<string, number>;
-}
-
-export interface TrendAnalytics {
-  trend: string;
-  average_score: number;
-  recent_average: number;
 }
 
 export interface Recommendation {
   strategy: string;
-  selected_skill: string;
+  priority_skill?: string;
+  selected_skill?: string;
   reason: string;
 }
 
@@ -49,6 +47,22 @@ export interface WeakSkill {
   score: number;
   priority: string;
   recommendation: string;
+}
+
+export interface ErrorStatistics {
+  total_errors: number;
+  active_errors?: number;
+  resolved_errors?: number;
+  error_distribution: Record<string, unknown>;
+}
+
+export interface TrendAnalytics {
+  trend: string;
+  average_score: number;
+  recent_average: number;
+  highest_score?: number;
+  lowest_score?: number;
+  total_attempts?: number;
 }
 
 export interface DailyMission {
@@ -67,14 +81,22 @@ export interface AchievementBadge {
 
 export interface DashboardResponse {
   summary: DashboardSummary;
-  skill_progress: SkillProgress[];
-  learning_timeline: TimelineItem[];
-  practice_history: PracticeHistory[];
-  recommendations: Recommendation;
-  error_statistics: ErrorStatistics;
-  trend_analytics: TrendAnalytics;
-  weak_skills: WeakSkill[];
-  daily_missions: DailyMission[];
-  achievement_badges: AchievementBadge[];
 
+  skill_progress: SkillProgress[];
+
+  learning_timeline: TimelineItem[];
+
+  practice_history: PracticeHistoryItem[];
+
+  recommendations: Recommendation;
+
+  error_statistics: ErrorStatistics;
+
+  trend_analytics: TrendAnalytics;
+
+  weak_skills: WeakSkill[];
+
+  daily_missions: DailyMission[];
+
+  achievement_badges: AchievementBadge[];
 }
