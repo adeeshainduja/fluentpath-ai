@@ -12,3 +12,4 @@ class PracticeSubmissionResponse(BaseModel):
     vocabulary_score: float
     fluency_score: float
     pronunciation_score: float | None = None
+    suggestions: list[str] = []
