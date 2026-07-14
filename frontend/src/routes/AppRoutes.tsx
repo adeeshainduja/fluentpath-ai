@@ -7,6 +7,7 @@ import {
 import MainLayout from "../layouts/MainLayout";
 
 import Dashboard from "../pages/Dashboard/Dashboard";
+import PracticeDetails from "../pages/PracticeDetails/PracticeDetails";
 
 export default function AppRouter() {
   return (
@@ -19,6 +20,10 @@ export default function AppRouter() {
           <Route
             path="/"
             element={<Dashboard />}
+          />
+          <Route
+              path="/practice/:id"
+              element={<PracticeDetails />}
           />
 
         </Route>
