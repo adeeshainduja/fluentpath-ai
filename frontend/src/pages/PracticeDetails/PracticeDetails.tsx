@@ -6,6 +6,17 @@ import { usePracticeActions } from "../../hooks/usePracticeActions";
 
 import PracticeEditor from "../../components/practice/PracticeEditor";
 import ActionButtons from "../../components/practice/ActionButtons";
+import AIFeedback from "../../components/practice/AIFeedback";
+
+interface FeedbackResult {
+  score: number;
+  grammar_score: number;
+  vocabulary_score: number;
+  fluency_score: number;
+  pronunciation_score?: number | null;
+  feedback: string;
+  suggestions?: string[];
+}
 
 export default function PracticeDetail() {
   const { id } = useParams();
@@ -24,22 +35,34 @@ export default function PracticeDetail() {
   } = usePracticeActions();
 
   const [answer, setAnswer] = useState("");
+  const [feedback, setFeedback] = useState<FeedbackResult | null>(null);
+  const [message, setMessage] = useState("");
 
   const submitAnswer = async () => {
-    if (!id || !answer.trim()) return;
+    if (!id) return;
+
+    if (!answer.trim()) {
+      alert("Please write your answer before submitting.");
+      return;
+    }
 
     try {
       const result = await submit(Number(id), answer);
 
-      console.log("Submit Success");
       console.log(result);
 
-      // TODO:
-      // Show AI feedback
-      // Refresh practice
-      // Navigate to results page
+      if (result.result) {
+        setFeedback(result.result);
+      }
+
+      if (result.message) {
+        setMessage(result.message);
+      } else {
+        setMessage("Practice submitted successfully.");
+      }
     } catch (err) {
-      console.error("Submit Error:", err);
+      console.error(err);
+      setMessage("Failed to submit practice.");
     }
   };
 
@@ -49,10 +72,14 @@ export default function PracticeDetail() {
     try {
       const result = await regenerate(Number(id));
 
-      console.log("Regenerated");
       console.log(result);
+
+      setFeedback(null);
+      setAnswer("");
+      setMessage(result.message ?? "Practice regenerated.");
     } catch (err) {
       console.error(err);
+      setMessage("Failed to regenerate practice.");
     }
   };
 
@@ -62,10 +89,12 @@ export default function PracticeDetail() {
     try {
       const result = await complete(Number(id));
 
-      console.log("Completed");
       console.log(result);
+
+      setMessage(result.message ?? "Practice completed.");
     } catch (err) {
       console.error(err);
+      setMessage("Failed to complete practice.");
     }
   };
 
@@ -80,8 +109,6 @@ export default function PracticeDetail() {
   }
 
   if (error) {
-    console.log(error);
-
     return (
       <div className="p-8">
         <h1 className="text-xl text-red-600">
@@ -118,6 +145,13 @@ export default function PracticeDetail() {
           Complete the exercise below and submit your answer for AI feedback.
         </p>
       </div>
+
+      {/* Success Message */}
+      {message && (
+        <div className="rounded-xl border border-green-200 bg-green-50 p-4 text-green-700">
+          {message}
+        </div>
+      )}
 
       {/* Practice Card */}
       <div className="rounded-3xl bg-white p-8 shadow-sm">
@@ -156,7 +190,7 @@ export default function PracticeDetail() {
             Instructions
           </h3>
 
-          <div className="rounded-2xl bg-gray-50 p-6 leading-8">
+          <div className="rounded-2xl bg-gray-50 p-6 leading-8 whitespace-pre-line">
             {data.instruction}
           </div>
 
@@ -177,6 +211,13 @@ export default function PracticeDetail() {
         onComplete={completeTask}
         loading={actionLoading}
       />
+
+      {/* AI Feedback */}
+      {feedback && (
+        <AIFeedback
+          result={feedback}
+        />
+      )}
 
     </div>
   );
