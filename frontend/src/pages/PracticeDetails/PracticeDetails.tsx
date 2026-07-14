@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { usePractice } from "../../hooks/usePractice";
+import { usePracticeActions } from "../../hooks/usePracticeActions";
 
 import PracticeEditor from "../../components/practice/PracticeEditor";
 import ActionButtons from "../../components/practice/ActionButtons";
@@ -15,20 +16,62 @@ export default function PracticeDetail() {
     error,
   } = usePractice(Number(id));
 
+  const {
+    loading: actionLoading,
+    submit,
+    regenerate,
+    complete,
+  } = usePracticeActions();
+
   const [answer, setAnswer] = useState("");
 
-  const submitAnswer = () => {
-    console.log("Practice ID:", id);
-    console.log("User Answer:", answer);
+  const submitAnswer = async () => {
+    if (!id || !answer.trim()) return;
 
-    // TODO:
-    // Call backend API here
-    // POST /api/v1/practice/{id}/submit
+    try {
+      const result = await submit(Number(id), answer);
+
+      console.log("Submit Success");
+      console.log(result);
+
+      // TODO:
+      // Show AI feedback
+      // Refresh practice
+      // Navigate to results page
+    } catch (err) {
+      console.error("Submit Error:", err);
+    }
+  };
+
+  const regenerateTask = async () => {
+    if (!id) return;
+
+    try {
+      const result = await regenerate(Number(id));
+
+      console.log("Regenerated");
+      console.log(result);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const completeTask = async () => {
+    if (!id) return;
+
+    try {
+      const result = await complete(Number(id));
+
+      console.log("Completed");
+      console.log(result);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-[70vh]">
+      <div className="flex h-[70vh] items-center justify-center">
         <h1 className="text-xl font-semibold text-[#3D348B]">
           Loading...
         </h1>
@@ -54,7 +97,7 @@ export default function PracticeDetail() {
 
   if (!data) {
     return (
-      <div className="flex items-center justify-center h-[70vh]">
+      <div className="flex h-[70vh] items-center justify-center">
         <h1 className="text-xl font-semibold">
           Practice not found.
         </h1>
@@ -65,18 +108,18 @@ export default function PracticeDetail() {
   return (
     <div className="space-y-8">
 
-      {/* Page Title */}
+      {/* Header */}
       <div>
         <h1 className="text-4xl font-bold text-[#3D348B]">
           Practice Details
         </h1>
 
-        <p className="text-gray-500 mt-2">
+        <p className="mt-2 text-gray-500">
           Complete the exercise below and submit your answer for AI feedback.
         </p>
       </div>
 
-      {/* Practice Information */}
+      {/* Practice Card */}
       <div className="rounded-3xl bg-white p-8 shadow-sm">
 
         <h2 className="text-3xl font-bold text-[#3D348B]">
@@ -86,30 +129,22 @@ export default function PracticeDetail() {
         <div className="mt-6 grid grid-cols-2 gap-4">
 
           <p>
-            <span className="font-semibold">
-              Skill:
-            </span>{" "}
+            <span className="font-semibold">Skill:</span>{" "}
             {data.target_skill.replaceAll("_", " ")}
           </p>
 
           <p>
-            <span className="font-semibold">
-              Practice Type:
-            </span>{" "}
+            <span className="font-semibold">Practice Type:</span>{" "}
             {data.practice_type}
           </p>
 
           <p>
-            <span className="font-semibold">
-              Difficulty:
-            </span>{" "}
+            <span className="font-semibold">Difficulty:</span>{" "}
             {data.difficulty}
           </p>
 
           <p>
-            <span className="font-semibold">
-              Status:
-            </span>{" "}
+            <span className="font-semibold">Status:</span>{" "}
             {data.status}
           </p>
 
@@ -129,15 +164,18 @@ export default function PracticeDetail() {
 
       </div>
 
-      {/* Writing Area */}
+      {/* Writing Editor */}
       <PracticeEditor
         value={answer}
         onChange={setAnswer}
       />
 
-      {/* Buttons */}
+      {/* Action Buttons */}
       <ActionButtons
         onSubmit={submitAnswer}
+        onRegenerate={regenerateTask}
+        onComplete={completeTask}
+        loading={actionLoading}
       />
 
     </div>
