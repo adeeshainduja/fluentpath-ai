@@ -1,42 +1,48 @@
-interface StatsGridProps {
+interface Props {
   grammar: number;
   vocabulary: number;
   fluency: number;
   pronunciation: number;
 }
 
-interface StatCardProps {
-  title: string;
-  value: number;
-  color: string;
-}
-
-function StatCard({
+function SkillCard({
   title,
-  value,
+  score,
   color,
-}: StatCardProps) {
+}: {
+  title: string;
+  score: number;
+  color: string;
+}) {
   return (
-    <div className="rounded-3xl bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+    <div className="rounded-3xl bg-white p-6 shadow-sm">
+
       <div className="flex items-center justify-between">
+
         <div>
-          <p className="text-gray-500">{title}</p>
+
+          <p className="text-gray-500">
+            {title}
+          </p>
 
           <h2 className="mt-2 text-4xl font-bold text-[#3D348B]">
-            {value}%
+            {score}%
           </h2>
+
         </div>
 
         <div
           className={`h-5 w-5 rounded-full ${color}`}
         />
+
       </div>
 
       <div className="mt-5 h-2 rounded-full bg-gray-200">
+
         <div
-          className="h-2 rounded-full transition-all duration-700"
+          className="h-2 rounded-full"
           style={{
-            width: `${value}%`,
+            width: `${score}%`,
             backgroundColor:
               color === "bg-blue-500"
                 ? "#3B82F6"
@@ -47,7 +53,9 @@ function StatCard({
                 : "#F97316",
           }}
         />
+
       </div>
+
     </div>
   );
 }
@@ -57,32 +65,34 @@ export default function StatsGrid({
   vocabulary,
   fluency,
   pronunciation,
-}: StatsGridProps) {
+}: Props) {
   return (
     <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-      <StatCard
+
+      <SkillCard
         title="Grammar"
-        value={grammar}
+        score={grammar}
         color="bg-blue-500"
       />
 
-      <StatCard
+      <SkillCard
         title="Vocabulary"
-        value={vocabulary}
+        score={vocabulary}
         color="bg-green-500"
       />
 
-      <StatCard
+      <SkillCard
         title="Fluency"
-        value={fluency}
+        score={fluency}
         color="bg-purple-500"
       />
 
-      <StatCard
+      <SkillCard
         title="Pronunciation"
-        value={pronunciation}
+        score={pronunciation}
         color="bg-orange-500"
       />
+
     </div>
   );
 }
