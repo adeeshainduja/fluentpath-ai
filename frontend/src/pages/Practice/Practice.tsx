@@ -6,6 +6,9 @@ import {
   Languages,
 } from "lucide-react";
 
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
 const practiceTypes = [
   {
     title: "Writing",
@@ -40,6 +43,23 @@ const practiceTypes = [
 ];
 
 export default function Practice() {
+  const navigate = useNavigate();
+
+  const startPractice = async () => {
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/v1/practice-tasks/learners/1/generate"
+      );
+
+      const task = response.data;
+
+      navigate(`/practice/${task.id}`);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to generate practice.");
+    }
+  };
+
   return (
     <div className="space-y-8">
       <div>
@@ -75,7 +95,10 @@ export default function Practice() {
                 {item.description}
               </p>
 
-              <button className="mt-6 w-full rounded-xl bg-[#3D348B] py-3 font-semibold text-white hover:bg-[#2d2770]">
+              <button
+                onClick={startPractice}
+                className="mt-6 w-full rounded-xl bg-[#3D348B] py-3 font-semibold text-white hover:bg-[#2d2770]"
+              >
                 Start Practice
               </button>
             </div>

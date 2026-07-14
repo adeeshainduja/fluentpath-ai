@@ -21,15 +21,19 @@ from app.services.practice_task_service import (
     submit_task_attempt,
 )
 
+from app.services.practice_evaluation_service import (
+    evaluate_practice,
+)
+
 router = APIRouter(
     prefix="/api/v1/practice-tasks",
     tags=["Practice Tasks"],
 )
 
 
-# --------------------------------------------------
-# Generate a personalized practice task
-# --------------------------------------------------
+# ==========================================================
+# Generate Personalized Practice Task
+# ==========================================================
 
 @router.post(
     "/learners/{learner_id}/generate",
@@ -53,9 +57,35 @@ def generate_task(
     return result
 
 
-# --------------------------------------------------
-# Get all tasks for a learner
-# --------------------------------------------------
+# ==========================================================
+# Generate Adaptive Practice Task
+# ==========================================================
+
+@router.post(
+    "/learners/{learner_id}/generate-adaptive",
+    response_model=PracticeTaskResponse,
+)
+def generate_adaptive_task_endpoint(
+    learner_id: int,
+    db: Session = Depends(get_db),
+):
+    result = generate_adaptive_practice_task(
+        db=db,
+        learner_id=learner_id,
+    )
+
+    if isinstance(result, dict) and "error" in result:
+        raise HTTPException(
+            status_code=400,
+            detail=result["error"],
+        )
+
+    return result
+
+
+# ==========================================================
+# Get All Tasks
+# ==========================================================
 
 @router.get(
     "/learners/{learner_id}",
@@ -71,9 +101,9 @@ def list_tasks(
     )
 
 
-# --------------------------------------------------
-# Get one practice task
-# --------------------------------------------------
+# ==========================================================
+# Get One Task
+# ==========================================================
 
 @router.get(
     "/{task_id}",
@@ -97,9 +127,9 @@ def read_task(
     return task
 
 
-# --------------------------------------------------
-# Submit learner answer for a task
-# --------------------------------------------------
+# ==========================================================
+# Submit Practice Task
+# ==========================================================
 
 @router.post("/{task_id}/submit")
 def submit_task(
@@ -107,25 +137,38 @@ def submit_task(
     request: PracticeTaskSubmission,
     db: Session = Depends(get_db),
 ):
-    result = submit_task_attempt(
+    attempt = submit_task_attempt(
         db=db,
         task_id=task_id,
         text=request.text,
     )
 
-    if isinstance(result, dict) and "error" in result:
+    if isinstance(attempt, dict) and "error" in attempt:
         raise HTTPException(
             status_code=404,
-            detail=result["error"],
+            detail=attempt["error"],
         )
 
+    evaluation = evaluate_practice(
+        db=db,
+        attempt_id=attempt.id,
+    )
+
     return {
-        "attempt_id": result.id,
-        "task_id": result.task_id,
-        "learner_id": result.learner_id,
-        "text": result.text,
-        "attempt_number": result.attempt_number,
+        "attempt": {
+            "id": attempt.id,
+            "task_id": attempt.task_id,
+            "learner_id": attempt.learner_id,
+            "text": attempt.text,
+            "attempt_number": attempt.attempt_number,
+        },
+        "evaluation": evaluation,
     }
+
+
+# ==========================================================
+# Get Attempt History
+# ==========================================================
 
 @router.get("/{task_id}/attempts")
 def list_task_attempts(
@@ -161,24 +204,3 @@ def list_task_attempts(
             for attempt in attempts
         ],
     }
-
-@router.post(
-    "/learners/{learner_id}/generate-adaptive",
-    response_model=PracticeTaskResponse,
-)
-def generate_adaptive_task_endpoint(
-    learner_id: int,
-    db: Session = Depends(get_db),
-):
-    result = generate_adaptive_practice_task(
-        db=db,
-        learner_id=learner_id,
-    )
-
-    if isinstance(result, dict) and "error" in result:
-        raise HTTPException(
-            status_code=400,
-            detail=result["error"],
-        )
-
-    return result
