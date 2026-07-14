@@ -3,19 +3,18 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.services import practice_service
+
 from app.schemas.practice import (
     PracticeAttemptCreate,
     RetryAttemptCreate,
 )
-from app.schemas.practice_submission import (
-    PracticeSubmissionRequest,
+
+from app.memory.learner_memory import (
+    get_learner_weaknesses,
 )
-from app.memory.learner_memory import get_learner_weaknesses
+
 from app.services.practice_detail_service import (
     get_practice_detail,
-)
-from app.services.practice_evaluation_service import (
-    evaluate_practice,
 )
 
 router = APIRouter(
@@ -23,6 +22,10 @@ router = APIRouter(
     tags=["Practice"],
 )
 
+
+# --------------------------------------------------
+# Create Writing Attempt
+# --------------------------------------------------
 
 @router.post("/writing")
 def create_writing_attempt(
@@ -43,14 +46,20 @@ def create_writing_attempt(
     }
 
 
+# --------------------------------------------------
+# Get All Attempts
+# --------------------------------------------------
+
 @router.get("/attempts")
 def get_attempts(
     db: Session = Depends(get_db),
 ):
-    attempts = practice_service.get_all_attempts(db)
+    return practice_service.get_all_attempts(db)
 
-    return attempts
 
+# --------------------------------------------------
+# Get Attempt
+# --------------------------------------------------
 
 @router.get("/attempts/{attempt_id}")
 def get_attempt(
@@ -71,12 +80,15 @@ def get_attempt(
     return attempt
 
 
+# --------------------------------------------------
+# Analyze Attempt
+# --------------------------------------------------
+
 @router.post("/attempts/{attempt_id}/analyze")
 def analyze_practice_attempt(
     attempt_id: int,
     db: Session = Depends(get_db),
 ):
-
     result = practice_service.analyze_attempt(
         db=db,
         attempt_id=attempt_id,
@@ -91,13 +103,16 @@ def analyze_practice_attempt(
     return result
 
 
+# --------------------------------------------------
+# Retry Attempt
+# --------------------------------------------------
+
 @router.post("/attempts/{attempt_id}/retry")
 def retry_practice_attempt(
     attempt_id: int,
     retry_data: RetryAttemptCreate,
     db: Session = Depends(get_db),
 ):
-
     result = practice_service.create_retry_attempt(
         db=db,
         original_attempt_id=attempt_id,
@@ -113,19 +128,24 @@ def retry_practice_attempt(
     return result
 
 
+# --------------------------------------------------
+# Learner Weaknesses
+# --------------------------------------------------
+
 @router.get("/learners/{learner_id}/weaknesses")
 def get_weaknesses(
     learner_id: int,
     db: Session = Depends(get_db),
 ):
-
-    weaknesses = get_learner_weaknesses(
+    return get_learner_weaknesses(
         db=db,
         learner_id=learner_id,
     )
 
-    return weaknesses
 
+# --------------------------------------------------
+# Practice Detail
+# --------------------------------------------------
 
 @router.get("/{task_id}")
 def get_practice(
@@ -144,46 +164,3 @@ def get_practice(
         )
 
     return task
-
-
-# -----------------------------
-# Submit Practice
-# -----------------------------
-@router.post("/{task_id}/submit")
-def submit_practice(
-    task_id: int,
-    request: PracticeSubmissionRequest,
-):
-    result = evaluate_practice(request.answer)
-
-    return {
-        "message": "Practice submitted successfully.",
-        "task_id": task_id,
-        "result": result,
-    }
-
-
-# -----------------------------
-# Complete Practice
-# -----------------------------
-@router.post("/{task_id}/complete")
-def complete_practice(
-    task_id: int,
-):
-    return {
-        "message": "Practice completed successfully.",
-        "task_id": task_id,
-    }
-
-
-# -----------------------------
-# Regenerate Practice
-# -----------------------------
-@router.post("/{task_id}/regenerate")
-def regenerate_practice(
-    task_id: int,
-):
-    return {
-        "message": "New practice generated successfully.",
-        "task_id": task_id,
-    }
