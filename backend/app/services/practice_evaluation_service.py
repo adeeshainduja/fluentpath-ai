@@ -1,3 +1,7 @@
+from sqlalchemy.orm import Session
+
+from app.models.practice_attempt import PracticeAttempt
+
 from app.schemas.practice_submission import (
     PracticeSubmissionResponse,
 )
@@ -7,9 +11,21 @@ from app.services.gemini_service import (
 )
 
 
-def evaluate_practice(answer: str):
+def evaluate_practice(
+    db: Session,
+    attempt_id: int,
+) -> PracticeSubmissionResponse:
 
-    result = evaluate_english(answer)
+    attempt = (
+        db.query(PracticeAttempt)
+        .filter(PracticeAttempt.id == attempt_id)
+        .first()
+    )
+
+    if attempt is None:
+        raise ValueError("Practice attempt not found")
+
+    result = evaluate_english(attempt.text)
 
     return PracticeSubmissionResponse(
         score=result["score"],
@@ -17,6 +33,8 @@ def evaluate_practice(answer: str):
         grammar_score=result["grammar_score"],
         vocabulary_score=result["vocabulary_score"],
         fluency_score=result["fluency_score"],
-        pronunciation_score=None,
+        pronunciation_score=result.get(
+            "pronunciation_score"
+        ),
         suggestions=result["suggestions"],
     )

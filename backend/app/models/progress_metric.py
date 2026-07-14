@@ -52,6 +52,29 @@ class ProgressMetric(Base):
         Integer,
         nullable=False,
     )
+    grammar_score: Mapped[int] = mapped_column(
+        Integer,
+        default=0,
+        nullable=False,
+    )
+
+    vocabulary_score: Mapped[int] = mapped_column(
+        Integer,
+        default=0,
+        nullable=False,
+    )
+
+    fluency_score: Mapped[int] = mapped_column(
+        Integer,
+        default=0,
+        nullable=False,
+    )
+
+    pronunciation_score: Mapped[int] = mapped_column(
+        Integer,
+        default=0,
+        nullable=False,
+    )
 
     response_length: Mapped[int] = mapped_column(
         Integer,
