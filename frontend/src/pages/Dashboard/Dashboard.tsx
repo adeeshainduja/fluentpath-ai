@@ -55,7 +55,7 @@ export default function Dashboard() {
           <ProgressChart timeline={data.learning_timeline} />
         </div>
 
-        <RecommendationCard recommendation={data.summary} />
+        <RecommendationCard recommendation={data.recommendations} />
       </div>
 
       {/* Skills + Goal */}
