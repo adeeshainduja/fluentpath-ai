@@ -1,5 +1,15 @@
+interface Feedback {
+  score: number;
+  grammar_score: number;
+  vocabulary_score: number;
+  fluency_score: number;
+  pronunciation_score?: number | null;
+  feedback: string;
+  suggestions?: string[];
+}
+
 type Props = {
-  feedback: any;
+  feedback: Feedback | null;
 };
 
 export default function AIFeedback({
@@ -9,7 +19,6 @@ export default function AIFeedback({
 
   return (
     <div className="rounded-3xl bg-white p-8 shadow-sm">
-
       <h2 className="text-2xl font-bold text-[#3D348B]">
         AI Feedback
       </h2>
@@ -59,38 +68,32 @@ export default function AIFeedback({
       </div>
 
       <div className="mt-8">
-
-        <h3 className="font-bold text-lg text-[#3D348B]">
+        <h3 className="text-lg font-bold text-[#3D348B]">
           Feedback
         </h3>
 
-        <p className="mt-2 leading-8">
+        <p className="mt-2 rounded-xl bg-gray-50 p-4 leading-8">
           {feedback.feedback}
         </p>
-
       </div>
 
-      <div className="mt-8">
+      {feedback.suggestions && feedback.suggestions.length > 0 && (
+        <div className="mt-8">
+          <h3 className="text-lg font-bold text-[#3D348B]">
+            Suggestions
+          </h3>
 
-        <h3 className="font-bold text-lg text-[#3D348B]">
-          Suggestions
-        </h3>
-
-        <ul className="mt-3 list-disc space-y-2 pl-6">
-          {feedback.suggestions.map(
-            (
-              suggestion: string,
-              index: number
-            ) => (
-              <li key={index}>
-                {suggestion}
-              </li>
-            )
-          )}
-        </ul>
-
-      </div>
-
+          <ul className="mt-3 list-disc space-y-2 pl-6">
+            {feedback.suggestions.map(
+              (suggestion, index) => (
+                <li key={index}>
+                  {suggestion}
+                </li>
+              )
+            )}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
