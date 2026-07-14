@@ -7,7 +7,16 @@ from app.schemas.practice import (
     PracticeAttemptCreate,
     RetryAttemptCreate,
 )
+from app.schemas.practice_submission import (
+    PracticeSubmissionRequest,
+)
 from app.memory.learner_memory import get_learner_weaknesses
+from app.services.practice_detail_service import (
+    get_practice_detail,
+)
+from app.services.practice_evaluation_service import (
+    evaluate_practice,
+)
 
 router = APIRouter(
     prefix="/api/v1/practice",
@@ -61,6 +70,7 @@ def get_attempt(
 
     return attempt
 
+
 @router.post("/attempts/{attempt_id}/analyze")
 def analyze_practice_attempt(
     attempt_id: int,
@@ -79,6 +89,7 @@ def analyze_practice_attempt(
         )
 
     return result
+
 
 @router.post("/attempts/{attempt_id}/retry")
 def retry_practice_attempt(
@@ -101,6 +112,7 @@ def retry_practice_attempt(
 
     return result
 
+
 @router.get("/learners/{learner_id}/weaknesses")
 def get_weaknesses(
     learner_id: int,
@@ -113,3 +125,65 @@ def get_weaknesses(
     )
 
     return weaknesses
+
+
+@router.get("/{task_id}")
+def get_practice(
+    task_id: int,
+    db: Session = Depends(get_db),
+):
+    task = get_practice_detail(
+        db=db,
+        task_id=task_id,
+    )
+
+    if task is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Practice not found",
+        )
+
+    return task
+
+
+# -----------------------------
+# Submit Practice
+# -----------------------------
+@router.post("/{task_id}/submit")
+def submit_practice(
+    task_id: int,
+    request: PracticeSubmissionRequest,
+):
+    result = evaluate_practice(request.answer)
+
+    return {
+        "message": "Practice submitted successfully.",
+        "task_id": task_id,
+        "result": result,
+    }
+
+
+# -----------------------------
+# Complete Practice
+# -----------------------------
+@router.post("/{task_id}/complete")
+def complete_practice(
+    task_id: int,
+):
+    return {
+        "message": "Practice completed successfully.",
+        "task_id": task_id,
+    }
+
+
+# -----------------------------
+# Regenerate Practice
+# -----------------------------
+@router.post("/{task_id}/regenerate")
+def regenerate_practice(
+    task_id: int,
+):
+    return {
+        "message": "New practice generated successfully.",
+        "task_id": task_id,
+    }

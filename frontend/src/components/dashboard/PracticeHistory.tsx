@@ -1,4 +1,5 @@
 import { Eye } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface PracticeItem {
   task_id: number;
@@ -14,6 +15,9 @@ interface PracticeHistoryProps {
 export default function PracticeHistory({
   history,
 }: PracticeHistoryProps) {
+
+  const navigate = useNavigate();
+
   return (
     <div className="rounded-3xl bg-white p-6 shadow-sm">
       <h2 className="mb-6 text-xl font-bold text-[#3D348B]">
@@ -59,9 +63,12 @@ export default function PracticeHistory({
               </td>
 
               <td>
-                <button className="rounded-lg p-2 transition hover:bg-gray-100">
-                  <Eye size={18} />
-                </button>
+                <button
+                onClick={() => navigate(`/practice/${item.task_id}`)}
+                className="rounded-lg p-2 hover:bg-gray-100"
+              >
+                <Eye size={18} />
+              </button>
               </td>
             </tr>
           ))}
