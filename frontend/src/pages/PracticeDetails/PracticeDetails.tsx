@@ -15,7 +15,7 @@ interface FeedbackResult {
   fluency_score: number;
   pronunciation_score?: number | null;
   feedback: string;
-  suggestions?: string[];
+  suggestions: string[];
 }
 
 export default function PracticeDetail() {
@@ -51,15 +51,11 @@ export default function PracticeDetail() {
 
       console.log(result);
 
-      if (result.result) {
-        setFeedback(result.result);
+      if (result.evaluation) {
+        setFeedback(result.evaluation);
       }
 
-      if (result.message) {
-        setMessage(result.message);
-      } else {
-        setMessage("Practice submitted successfully.");
-      }
+      setMessage("Practice submitted successfully.");
     } catch (err) {
       console.error(err);
       setMessage("Failed to submit practice.");
@@ -76,6 +72,7 @@ export default function PracticeDetail() {
 
       setFeedback(null);
       setAnswer("");
+
       setMessage(result.message ?? "Practice regenerated.");
     } catch (err) {
       console.error(err);
@@ -146,7 +143,7 @@ export default function PracticeDetail() {
         </p>
       </div>
 
-      {/* Success Message */}
+      {/* Message */}
       {message && (
         <div className="rounded-xl border border-green-200 bg-green-50 p-4 text-green-700">
           {message}
@@ -198,13 +195,13 @@ export default function PracticeDetail() {
 
       </div>
 
-      {/* Writing Editor */}
+      {/* Editor */}
       <PracticeEditor
         value={answer}
         onChange={setAnswer}
       />
 
-      {/* Action Buttons */}
+      {/* Buttons */}
       <ActionButtons
         onSubmit={submitAnswer}
         onRegenerate={regenerateTask}
@@ -215,7 +212,7 @@ export default function PracticeDetail() {
       {/* AI Feedback */}
       {feedback && (
         <AIFeedback
-          result={feedback}
+          feedback={feedback}
         />
       )}
 
