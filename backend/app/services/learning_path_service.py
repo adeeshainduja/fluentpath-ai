@@ -1,10 +1,8 @@
 from sqlalchemy.orm import Session
 
 from app.schemas.learning_path import (
-    Badge,
-    CurrentStage,
     LearningPathResponse,
-    RoadmapItem,
+    CurrentStage,
 )
 
 from app.services.analytics_service import (
@@ -14,8 +12,25 @@ from app.services.analytics_service import (
 from app.services.adaptive_priority_service import (
     calculate_adaptive_priorities,
 )
+
 from app.services.streak_service import (
     calculate_learning_streak,
+)
+
+from app.services.badge_service import (
+    calculate_badges,
+)
+
+from app.services.recommendation_service import (
+    get_next_recommended_task,
+)
+
+from app.services.roadmap_service import (
+    generate_learning_roadmap,
+)
+
+from app.services.ai_coach_service import (
+    generate_ai_coach_message,
 )
 
 
@@ -25,39 +40,65 @@ def get_learning_path(
 ) -> LearningPathResponse:
     """
     Generate a personalized learning path
-    based on learner analytics.
+    for the learner.
     """
 
-    # -----------------------------------------
+    # -------------------------------------------------
     # Overall Progress
-    # -----------------------------------------
+    # -------------------------------------------------
 
     overall_progress = get_overall_score(
         db=db,
         learner_id=learner_id,
     )
 
-    # -----------------------------------------
+    # -------------------------------------------------
+    # Current Learning Streak
+    # -------------------------------------------------
+
+    streak = calculate_learning_streak(
+        db=db,
+        learner_id=learner_id,
+    )
+
+    # -------------------------------------------------
     # Adaptive Priorities
-    # -----------------------------------------
+    # -------------------------------------------------
 
     priorities = calculate_adaptive_priorities(
         db=db,
         learner_id=learner_id,
     )
 
-    # -----------------------------------------
-    # Current Lesson
-    # -----------------------------------------
+    # -------------------------------------------------
+    # Recommended Lesson
+    # -------------------------------------------------
 
-    if priorities:
+    recommended_task = get_next_recommended_task(
+        db=db,
+        learner_id=learner_id,
+    )
 
-        highest = priorities[0]
+    # -------------------------------------------------
+    # Current Stage
+    # -------------------------------------------------
+
+    if recommended_task:
+
+        current_stage = CurrentStage(
+            id=recommended_task.id,
+            title=recommended_task.title,
+            skill=recommended_task.target_skill,
+            difficulty=recommended_task.difficulty,
+            estimated_minutes=20,
+        )
+
+    elif priorities:
 
         current_stage = CurrentStage(
             id=1,
-            title=f"{highest['skill']} Practice",
-            skill=highest["skill"],
+            title=f"{priorities[0]['skill']} Practice",
+            skill=priorities[0]["skill"],
             difficulty="Intermediate",
             estimated_minutes=20,
         )
@@ -72,105 +113,40 @@ def get_learning_path(
             estimated_minutes=20,
         )
 
-    # -----------------------------------------
-    # Learning Roadmap
-    # -----------------------------------------
+    # -------------------------------------------------
+    # Personalized Roadmap
+    # -------------------------------------------------
 
-    roadmap = []
-
-    if priorities:
-
-        for index, priority in enumerate(priorities):
-
-            roadmap.append(
-                RoadmapItem(
-                    id=index + 1,
-                    title=f"{priority['skill']} Practice",
-                    skill=priority["skill"],
-                    difficulty="Intermediate",
-                    estimated_minutes=20,
-                    status=(
-                        "current"
-                        if index == 0
-                        else "locked"
-                    ),
-                )
-            )
-
-    else:
-
-        roadmap = [
-            RoadmapItem(
-                id=1,
-                title="Grammar Basics",
-                skill="Grammar",
-                difficulty="Beginner",
-                estimated_minutes=15,
-                status="current",
-            )
-        ]
-
-    # -----------------------------------------
-    # AI Coach Message
-    # -----------------------------------------
-
-    if priorities:
-
-        coach_message = (
-            f"Your weakest skill is "
-            f"{priorities[0]['skill']}. "
-            f"Practice this skill first to improve "
-            f"your overall communication score."
-        )
-
-    else:
-
-        coach_message = (
-            "Welcome to FluentPath AI! "
-            "Let's begin your English learning journey."
-        )
-
-    # -----------------------------------------
-    # Temporary Badges
-    # -----------------------------------------
-
-    badges = [
-        Badge(
-            id=1,
-            title="Getting Started",
-            description="Complete your first practice.",
-            earned=True,
-        ),
-        Badge(
-            id=2,
-            title="Grammar Master",
-            description="Reach 90% Grammar score.",
-            earned=False,
-        ),
-        Badge(
-            id=3,
-            title="Vocabulary Explorer",
-            description="Complete 20 vocabulary tasks.",
-            earned=False,
-        ),
-        Badge(
-            id=4,
-            title="7 Day Streak",
-            description="Practice for 7 consecutive days.",
-            earned=False,
-        ),
-    ]
-
-    # -----------------------------------------
-    # Response
-    # -----------------------------------------
-
-    return LearningPathResponse(
-        overall_progress=overall_progress,
-        streak = calculate_learning_streak(
+    roadmap = generate_learning_roadmap(
         db=db,
         learner_id=learner_id,
     )
+
+    # -------------------------------------------------
+    # Achievement Badges
+    # -------------------------------------------------
+
+    badges = calculate_badges(
+        db=db,
+        learner_id=learner_id,
+    )
+
+    # -------------------------------------------------
+    # AI Coach Message
+    # -------------------------------------------------
+
+    coach_message = generate_ai_coach_message(
+        db=db,
+        learner_id=learner_id,
+    )
+
+    # -------------------------------------------------
+    # Response
+    # -------------------------------------------------
+
+    return LearningPathResponse(
+        overall_progress=overall_progress,
+        streak=streak,
         coach_message=coach_message,
         current_stage=current_stage,
         roadmap=roadmap,
