@@ -1,0 +1,95 @@
+-----------------------------------------------------
+
+📚 Learning Path
+
+Your English Level
+
+Intermediate (72%)
+
+━━━━━━━━━━━━━━━━━━
+
+🎯 Today's Recommended Lesson ⭐
+
+Business Email Writing
+
+Writing
+
+20 minutes
+
+[Start Practice]
+
+-----------------------------------------------------
+
+🧠 AI Coach
+
+"Great improvement!
+
+Grammar has improved by 12%.
+
+Vocabulary is now your weakest skill.
+
+Today's recommendation is Business Email Writing."
+
+-----------------------------------------------------
+
+🛣 Your Journey
+
+✅ Grammar Basics
+
+✅ Vocabulary Builder
+
+🟣 Business Email Writing (Current)
+
+🔒 Listening Skills
+
+🔒 Speaking Practice
+
+🔒 Mock Interview
+
+-----------------------------------------------------
+
+🔥 Streak
+
+5 Days
+
+🏆 Badges
+
+Grammar Master
+
+Vocabulary Explorer
+
+7 Day Streak
+
+-----------------------------------------------------
+
+Upcoming Goal
+
+Reach Overall Score
+
+80%
+
+████████░░
+
+-----------------------------------------------------
+
+
+LearningPath
+
+│
+
+├── LearningHeader
+
+├── RecommendationCard ⭐
+
+├── CoachPanel
+
+├── LearningTimeline
+
+├── CurrentLesson
+
+├── GoalCard ⭐
+
+├── StreakCard
+
+└── BadgeSection
+
