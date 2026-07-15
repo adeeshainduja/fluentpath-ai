@@ -9,6 +9,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+import RecommendedPractice from "../../components/practice/RecommendedPractice";
+import { useRecommendation } from "../../hooks/useRecommendation";
+
 const practiceTypes = [
   {
     title: "Writing",
@@ -45,15 +48,20 @@ const practiceTypes = [
 export default function Practice() {
   const navigate = useNavigate();
 
+  const learnerId = 1;
+
+  const {
+    data: recommendation,
+    isLoading,
+  } = useRecommendation(learnerId);
+
   const startPractice = async () => {
     try {
       const response = await axios.post(
         "http://127.0.0.1:8000/api/v1/practice-tasks/learners/1/generate"
       );
 
-      const task = response.data;
-
-      navigate(`/practice/${task.id}`);
+      navigate(`/practice/${response.data.id}`);
     } catch (error) {
       console.error(error);
       alert("Failed to generate practice.");
@@ -62,16 +70,31 @@ export default function Practice() {
 
   return (
     <div className="space-y-8">
+
+      {/* Page Header */}
       <div>
         <h1 className="text-4xl font-bold text-[#3D348B]">
           Practice
         </h1>
 
-        <p className="text-gray-500">
+        <p className="text-gray-500 mt-2">
           Choose a practice activity to improve your English.
         </p>
       </div>
 
+      {/* AI Recommendation */}
+      {!isLoading && recommendation && (
+        <RecommendedPractice
+          id={recommendation.id}
+          title={recommendation.title}
+          practiceType={recommendation.practice_type}
+          skill={recommendation.skill}
+          difficulty={recommendation.difficulty}
+          estimatedMinutes={recommendation.estimated_minutes}
+        />
+      )}
+
+      {/* Practice Cards */}
       <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
         {practiceTypes.map((item) => {
           const Icon = item.icon;
@@ -97,7 +120,7 @@ export default function Practice() {
 
               <button
                 onClick={startPractice}
-                className="mt-6 w-full rounded-xl bg-[#3D348B] py-3 font-semibold text-white hover:bg-[#2d2770]"
+                className="mt-6 w-full rounded-xl bg-[#3D348B] py-3 font-semibold text-white transition hover:bg-[#2d2770]"
               >
                 Start Practice
               </button>
@@ -105,6 +128,7 @@ export default function Practice() {
           );
         })}
       </div>
+
     </div>
   );
 }

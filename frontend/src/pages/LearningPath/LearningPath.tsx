@@ -1,7 +1,9 @@
 import LearningHeader from "../../components/learningPath/LearningHeader";
+import RecommendationCard from "../../components/learningPath/RecommendationCard";
 import ProgressOverview from "../../components/learningPath/ProgressOverview";
 import LearningTimeline from "../../components/learningPath/LearningTimeline";
 import CurrentLesson from "../../components/learningPath/CurrentLesson";
+import GoalCard from "../../components/learningPath/GoalCard";
 import CoachPanel from "../../components/learningPath/CoachPanel";
 import StreakCard from "../../components/learningPath/StreakCard";
 import BadgeSection from "../../components/learningPath/BadgeSection";
@@ -43,10 +45,20 @@ export default function LearningPath() {
       {/* Header */}
       <LearningHeader />
 
-      {/* Progress + AI Coach */}
-      <div className="grid grid-cols-3 gap-8">
+      {/* AI Recommendation */}
+      <RecommendationCard
+        id={data.current_stage.id}
+        title={data.current_stage.title}
+        skill={data.current_stage.skill}
+        difficulty={data.current_stage.difficulty}
+        estimatedMinutes={data.current_stage.estimated_minutes}
+        reason="Based on your latest learning progress and adaptive AI analysis, this lesson will help improve your weakest skill."
+      />
 
-        <div className="col-span-2">
+      {/* Progress + AI Coach */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <div className="lg:col-span-2">
           <ProgressOverview
             progress={data.overall_progress}
           />
@@ -58,22 +70,29 @@ export default function LearningPath() {
 
       </div>
 
-      {/* Learning Roadmap */}
+      {/* Learning Timeline */}
       <LearningTimeline
         roadmap={data.roadmap}
       />
 
-      {/* Current Lesson + Side Cards */}
-      <div className="grid grid-cols-3 gap-8">
+      {/* Lesson + Goal + Side Cards */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-        <div className="col-span-2">
+        {/* Left Side */}
+        <div className="lg:col-span-2 space-y-8">
 
           <CurrentLesson
             lesson={data.current_stage}
           />
 
+          <GoalCard
+            current={data.overall_progress}
+            target={80}
+          />
+
         </div>
 
+        {/* Right Side */}
         <div className="space-y-8">
 
           <StreakCard
