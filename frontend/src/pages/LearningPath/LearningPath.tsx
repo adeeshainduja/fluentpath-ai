@@ -47,11 +47,12 @@ export default function LearningPath() {
 
       {/* AI Recommendation */}
       <RecommendationCard
+        id={data.current_stage.id}
         title={data.current_stage.title}
         skill={data.current_stage.skill}
         difficulty={data.current_stage.difficulty}
         estimatedMinutes={data.current_stage.estimated_minutes}
-        reason="This lesson has been selected based on your recent performance and current weakest skill."
+        reason="Based on your latest learning progress and adaptive AI analysis, this lesson will help improve your weakest skill."
       />
 
       {/* Progress + AI Coach */}
@@ -74,9 +75,10 @@ export default function LearningPath() {
         roadmap={data.roadmap}
       />
 
-      {/* Current Lesson + Goal + Side Cards */}
+      {/* Lesson + Goal + Side Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
+        {/* Left Side */}
         <div className="lg:col-span-2 space-y-8">
 
           <CurrentLesson
@@ -90,6 +92,7 @@ export default function LearningPath() {
 
         </div>
 
+        {/* Right Side */}
         <div className="space-y-8">
 
           <StreakCard
