@@ -67,8 +67,10 @@ print("Before import")
 from app.api.learning_path import (
     router as learning_path_router,
 )
+from app.api.speaking import (
+    router as speaking_router,
+)
 
-print("After import")
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -117,7 +119,8 @@ app.include_router(practice_strategies_router)
 app.include_router(practice_sessions_router)
 app.include_router(dashboard_router)
 app.include_router(learning_path_router)
-print("Router included")
+app.include_router(speaking_router)
+
 # --------------------------------------------------
 # Root endpoint
 # --------------------------------------------------
