@@ -1,0 +1,61 @@
+Today's Practice
+
+⭐ Recommended for You
+──────────────────────────────────────
+🎤 Speaking
+Improve pronunciation and fluency
+Estimated: 10 min
+[Continue]
+
+Other Activities
+
+✍️ Writing
+Improve grammar and writing
+
+📚 Vocabulary
+Learn new words
+
+🎧 Listening
+Train listening skills
+
+📖 Reading
+Improve comprehension
+
+💼 Interview
+Practice real interview questions
+
+Practice Page
+      │
+      ▼
+Recommendation Engine
+      │
+      ▼
+Current Recommended Practice
+      │
+      ├── Writing
+      ├── Speaking
+      ├── Listening
+      ├── Reading
+      ├── Vocabulary
+      └── Interview
+
+
+Practice
+│
+├── Writing
+│      └── WritingPractice.tsx
+│
+├── Speaking
+│      └── SpeakingPractice.tsx
+│
+├── Listening
+│      └── ListeningPractice.tsx
+│
+├── Reading
+│      └── ReadingPractice.tsx
+│
+├── Vocabulary
+│      └── VocabularyPractice.tsx
+│
+└── Interview
+       └── InterviewPractice.tsx

@@ -13,7 +13,37 @@ genai.configure(
 model = genai.GenerativeModel("gemini-2.5-flash")
 
 
+def evaluate_text(prompt: str):
+    """
+    Generic Gemini evaluator.
+    Returns parsed JSON if possible,
+    otherwise returns raw text.
+    """
+
+    response = model.generate_content(prompt)
+
+    text = response.text.strip()
+
+    if text.startswith("```"):
+        text = (
+            text.replace("```json", "")
+            .replace("```", "")
+            .strip()
+        )
+
+    try:
+        return json.loads(text)
+    except Exception:
+        return {
+            "response": text
+        }
+
+
 def evaluate_english(answer: str):
+    """
+    Writing evaluation.
+    """
+
     prompt = f"""
 You are an English communication coach.
 
@@ -25,20 +55,13 @@ Student Answer:
 Return ONLY valid JSON.
 
 {{
-    "score": 0,
-    "grammar_score": 0,
-    "vocabulary_score": 0,
-    "fluency_score": 0,
-    "feedback": "",
-    "suggestions": []
+    "score":0,
+    "grammar_score":0,
+    "vocabulary_score":0,
+    "fluency_score":0,
+    "feedback":"",
+    "suggestions":[]
 }}
 """
 
-    response = model.generate_content(prompt)
-
-    text = response.text.strip()
-
-    if text.startswith("```"):
-        text = text.replace("```json", "").replace("```", "").strip()
-
-    return json.loads(text)
+    return evaluate_text(prompt)
