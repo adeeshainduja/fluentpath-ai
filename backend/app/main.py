@@ -70,7 +70,9 @@ from app.api.learning_path import (
 from app.api.speaking import (
     router as speaking_router,
 )
-
+from app.api.recommendations import (
+    router as recommendation_router,
+)
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -120,6 +122,7 @@ app.include_router(practice_sessions_router)
 app.include_router(dashboard_router)
 app.include_router(learning_path_router)
 app.include_router(speaking_router)
+app.include_router(recommendation_router)
 
 # --------------------------------------------------
 # Root endpoint
