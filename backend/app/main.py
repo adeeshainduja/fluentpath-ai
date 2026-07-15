@@ -16,7 +16,7 @@ from app.models.error_pattern import ErrorPattern
 from app.models.practice_attempt import PracticeAttempt
 from app.models.practice_task import PracticeTask
 from app.models.progress_metric import ProgressMetric
-from app.api.dashboard import router as dashboard_router
+
 
 # --------------------------------------------------
 # Import API routers
@@ -61,6 +61,15 @@ from app.api.practice_strategies import (
 from app.api.practice_sessions import (
     router as practice_sessions_router,
 )
+from app.api.dashboard import router as dashboard_router
+print("Before import")
+
+from app.api.learning_path import (
+    router as learning_path_router,
+)
+
+print("After import")
+
 from fastapi.middleware.cors import CORSMiddleware
 
 # --------------------------------------------------
@@ -107,8 +116,8 @@ app.include_router(adaptive_priorities_router)
 app.include_router(practice_strategies_router)
 app.include_router(practice_sessions_router)
 app.include_router(dashboard_router)
-
-
+app.include_router(learning_path_router)
+print("Router included")
 # --------------------------------------------------
 # Root endpoint
 # --------------------------------------------------
