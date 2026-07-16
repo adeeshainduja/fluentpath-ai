@@ -1,12 +1,13 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class PracticeAttemptCreate(BaseModel):
-    text: str
+    learner_id: int = Field(gt=0)
+    text: str = Field(min_length=1)
 
 
 class RetryAttemptCreate(BaseModel):
-    text: str
+    text: str = Field(min_length=1)
 
 
 class DetectedError(BaseModel):
