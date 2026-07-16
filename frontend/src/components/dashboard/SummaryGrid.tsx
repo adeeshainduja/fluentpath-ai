@@ -1,23 +1,15 @@
 import SummaryCard from "./SummaryCard";
-
-interface Summary {
-  average_score: number;
-  completed_tasks: number;
-  pending_tasks: number;
-  learning_trend: string;
-  recommended_skill: string;
-  recommended_strategy: string;
-}
+import type { DashboardSummary } from "../../types/dashboard";
 
 interface SummaryGridProps {
-  summary: Summary;
+  summary: DashboardSummary;
 }
 
 export default function SummaryGrid({
   summary,
 }: SummaryGridProps) {
   return (
-    <div className="grid grid-cols-4 gap-6">
+    <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-5">
       <SummaryCard
         title="Average Score"
         value={`${summary.average_score}%`}
@@ -25,18 +17,26 @@ export default function SummaryGrid({
       />
 
       <SummaryCard
-        title="Completed Tasks"
-        value={summary.completed_tasks}
+        title="Daily Streak"
+        value={`${summary.daily_streak} days`}
+      />
+
+      <SummaryCard
+        title="Total Practices"
+        value={summary.total_practices}
       />
 
       <SummaryCard
         title="Current Focus"
-        value={summary.recommended_skill}
+        value={summary.recommended_skill ?? "No data"}
       />
 
       <SummaryCard
         title="Strategy"
-        value={summary.recommended_strategy.replaceAll("_", " ")}
+        value={
+          summary.recommended_strategy?.replaceAll("_", " ") ??
+          "No data"
+        }
       />
     </div>
   );

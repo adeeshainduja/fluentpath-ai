@@ -28,13 +28,11 @@ def evaluate_practice(
     result = evaluate_english(attempt.text)
 
     return PracticeSubmissionResponse(
-        score=result["score"],
-        feedback=result["feedback"],
-        grammar_score=result["grammar_score"],
-        vocabulary_score=result["vocabulary_score"],
-        fluency_score=result["fluency_score"],
-        pronunciation_score=result.get(
-            "pronunciation_score"
-        ),
-        suggestions=result["suggestions"],
+        score=result.score,
+        feedback=result.feedback,
+        grammar_score=result.grammar_score,
+        vocabulary_score=result.vocabulary_score,
+        fluency_score=result.fluency_score,
+        pronunciation_score=None,
+        suggestions=result.suggestions,
     )

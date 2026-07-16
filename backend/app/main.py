@@ -13,9 +13,17 @@ from app.core.database import Base, engine
 from app.models.analysis import Analysis
 from app.models.correction_state import CorrectionState
 from app.models.error_pattern import ErrorPattern
+from app.models.evaluation_records import (
+    Achievement,
+    ListeningEvaluation,
+    SpeakingEvaluation,
+    VocabularyProgress,
+    WritingEvaluation,
+)
 from app.models.practice_attempt import PracticeAttempt
 from app.models.practice_task import PracticeTask
 from app.models.progress_metric import ProgressMetric
+from app.models.speaking_attempt import SpeakingAttempt
 
 
 # --------------------------------------------------
@@ -24,6 +32,12 @@ from app.models.progress_metric import ProgressMetric
 
 from app.api.practice import (
     router as practice_router,
+)
+from app.api.practice_history import (
+    router as practice_history_router,
+)
+from app.api.learner_intelligence import (
+    router as learner_intelligence_router,
 )
 
 from app.api.learning_plan import (
@@ -62,7 +76,6 @@ from app.api.practice_sessions import (
     router as practice_sessions_router,
 )
 from app.api.dashboard import router as dashboard_router
-print("Before import")
 
 from app.api.learning_path import (
     router as learning_path_router,
@@ -75,6 +88,11 @@ from app.api.recommendations import (
 )
 
 from fastapi.middleware.cors import CORSMiddleware
+
+from app.api.auth import router as auth_router
+from app.api.user_management import router as user_management_router
+
+from app.models.user import User
 
 # --------------------------------------------------
 # FastAPI application
@@ -91,9 +109,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-    ],
+    allow_origin_regex=r"http://localhost:\d+",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -110,6 +126,8 @@ Base.metadata.create_all(bind=engine)
 # --------------------------------------------------
 
 app.include_router(practice_router)
+app.include_router(practice_history_router)
+app.include_router(learner_intelligence_router)
 app.include_router(learning_plan_router)
 app.include_router(hints_router)
 app.include_router(evaluations_router)
@@ -123,6 +141,8 @@ app.include_router(dashboard_router)
 app.include_router(learning_path_router)
 app.include_router(speaking_router)
 app.include_router(recommendation_router)
+app.include_router(auth_router)
+app.include_router(user_management_router)
 
 # --------------------------------------------------
 # Root endpoint

@@ -5,18 +5,45 @@ import {
 } from "react-router-dom";
 
 import MainLayout from "../layouts/MainLayout";
+import AuthLayout from "../layouts/AuthLayout";
+import ProtectedRoute from "./ProtectedRoute";
 
+import Login from "../pages/Auth/Login";
+import Register from "../pages/Auth/Register";
+import ForgotPassword from "../pages/Auth/ForgotPassword";
 import Dashboard from "../pages/Dashboard/Dashboard";
 import Practice from "../pages/Practice/Practice";
+import SpeakingPractice from "../pages/Practice/SpeakingPractice";
 import PracticeDetails from "../pages/PracticeDetails/PracticeDetails";
 import Analytics from "../pages/Analytics/Analytics";
+import LearningPath from "../pages/LearningPath/LearningPath";
+import AICoach from "../pages/AICoach/AICoach";
+import Profile from "../pages/Profile/Profile";
+//import History from "../pages/History/History";
+import Settings from "../pages/Settings/Settings";
+import ReadingPractice from "../pages/Practice/ReadingPractice";
 
 export default function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route element={<AuthLayout />}>
+          <Route
+            path="/login"
+            element={<Login />}
+          />
+          <Route
+            path="/register"
+            element={<Register />}
+          />
+          <Route
+            path="/forgot-password"
+            element={<ForgotPassword />}
+          />
+        </Route>
 
-        <Route element={<MainLayout />}>
+        <Route element={<ProtectedRoute />}>
+          <Route element={<MainLayout />}>
 
           {/* Dashboard */}
           <Route
@@ -30,6 +57,11 @@ export default function AppRouter() {
             element={<Practice />}
           />
 
+          <Route
+            path="/practice/speaking"
+            element={<SpeakingPractice />}
+          />
+
           {/* Practice Details */}
           <Route
             path="/practice/:id"
@@ -40,7 +72,37 @@ export default function AppRouter() {
             element={<Analytics />}
           />
 
+          <Route
+            path="/learning-path"
+            element={<LearningPath />}
+          />
 
+          <Route
+            path="/ai-coach"
+            element={<AICoach />}
+          />
+
+          <Route
+            path="/profile"
+            element={<Profile />}
+          />
+
+          {/* <Route
+            path="/history"
+            element={<History />}
+          /> */}
+
+          <Route
+            path="/settings"
+            element={<Settings />}
+          />
+          <Route
+            path="/practice/reading"
+            element={<ReadingPractice />}
+          />
+
+
+          </Route>
         </Route>
 
       </Routes>

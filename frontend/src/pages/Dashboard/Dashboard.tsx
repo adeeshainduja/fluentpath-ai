@@ -9,9 +9,11 @@ import PracticeHistory from "../../components/dashboard/PracticeHistory";
 import DailyMission from "../../components/dashboard/DailyMission";
 import AchievementBadges from "../../components/dashboard/AchievementBadges";
 import WeakSkills from "../../components/dashboard/WeakSkills";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function Dashboard() {
-  const { data, isLoading, error } = useDashboard(1);
+  const { user } = useAuth();
+  const { data, isLoading, error } = useDashboard();
 
   if (isLoading) {
     return (
@@ -33,6 +35,13 @@ export default function Dashboard() {
     );
   }
 
+  const strongSkills = [...data.skill_progress]
+    .sort(
+      (first, second) =>
+        second.average_score - first.average_score
+    )
+    .slice(0, 3);
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -42,7 +51,7 @@ export default function Dashboard() {
         </h1>
 
         <p className="text-gray-500">
-          Welcome back! Here's your learning overview.
+          Welcome back, {user?.full_name ?? "learner"}. Here's your learning overview.
         </p>
       </div>
 
@@ -76,6 +85,33 @@ export default function Dashboard() {
         <AchievementBadges badges={data.achievement_badges} />
       </div>
       <WeakSkills skills={data.weak_skills} />
+
+      <section className="rounded-2xl bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-bold text-[#3D348B]">
+          Strong Skills
+        </h2>
+        <div className="mt-4 grid gap-4 md:grid-cols-3">
+          {strongSkills.length === 0 ? (
+            <p className="text-gray-500">
+              Complete a few evaluated practices to reveal your strongest skills.
+            </p>
+          ) : (
+            strongSkills.map((skill) => (
+              <div
+                className="rounded-xl bg-[#F5F6FC] p-4"
+                key={skill.skill}
+              >
+                <p className="font-semibold capitalize text-[#4A4B4B]">
+                  {skill.skill}
+                </p>
+                <p className="mt-2 text-2xl font-bold text-[#3D348B]">
+                  {skill.average_score}%
+                </p>
+              </div>
+            ))
+          )}
+        </div>
+      </section>
     </div>
   );
 }

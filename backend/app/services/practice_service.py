@@ -8,15 +8,22 @@ from app.schemas.practice import (
 )
 from app.memory.learner_memory import update_error_memory
 from app.models.analysis import Analysis
+from app.models.evaluation_records import WritingEvaluation
 from app.schemas.practice import WritingAnalysisResult
 
 
 def create_writing_attempt(
     db: Session,
     attempt: PracticeAttemptCreate,
+    learner_id: int | None = None,
 ) -> PracticeAttempt:
+    resolved_learner_id = learner_id or attempt.learner_id
+
+    if resolved_learner_id is None:
+        raise ValueError("learner_id is required.")
 
     new_attempt = PracticeAttempt(
+        learner_id=resolved_learner_id,
         text=attempt.text,
         practice_type="writing",
     )
@@ -86,6 +93,8 @@ def create_retry_attempt(
         return None
 
     retry_attempt = PracticeAttempt(
+        learner_id=original_attempt.learner_id,
+        task_id=original_attempt.task_id,
         text=retry_data.text,
         practice_type=original_attempt.practice_type,
         parent_attempt_id=original_attempt.id,
@@ -149,7 +158,7 @@ def analyze_attempt(
 
     memory_updates = update_error_memory(
         db=db,
-        learner_id=1,
+        learner_id=attempt.learner_id,
         analysis=analysis,
     )
 
@@ -201,10 +210,18 @@ def analyze_attempt(
     )
 
     db.add(saved_analysis)
+    db.add(
+        WritingEvaluation(
+            user_id=attempt.learner_id,
+            attempt_id=attempt.id,
+            submitted_text=attempt.text,
+            result=analysis.model_dump(),
+        )
+    )
 
     memory_updates = update_error_memory(
         db=db,
-        learner_id=1,
+        learner_id=attempt.learner_id,
         analysis=analysis,
     )
 

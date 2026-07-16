@@ -4,6 +4,7 @@ import {
   ChartColumn,
   Route,
   Bot,
+  History,
   User,
   Settings,
 } from "lucide-react";
@@ -33,6 +34,11 @@ export const navigation = [
     title: "AI Coach",
     path: "/ai-coach",
     icon: Bot,
+  },
+  {
+    title: "History",
+    path: "/history",
+    icon: History,
   },
   {
     title: "Profile",

@@ -15,6 +15,12 @@ export function useRecommendation(
 
   useEffect(() => {
     async function load() {
+      if (!learnerId) {
+        setData(null);
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
 

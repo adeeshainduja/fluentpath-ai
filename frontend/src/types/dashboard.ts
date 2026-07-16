@@ -1,5 +1,7 @@
 export interface DashboardSummary {
   average_score: number;
+  daily_streak: number;
+  total_practices: number;
   completed_tasks: number;
   pending_tasks: number;
   learning_trend: string;
@@ -36,10 +38,10 @@ export interface PracticeHistoryItem {
 }
 
 export interface Recommendation {
-  strategy: string;
-  priority_skill?: string;
-  selected_skill?: string;
-  reason: string;
+  strategy: string | null;
+  priority_skill?: string | null;
+  selected_skill?: string | null;
+  reason: string | null;
 }
 
 export interface WeakSkill {
