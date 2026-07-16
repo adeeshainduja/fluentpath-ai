@@ -1,7 +1,7 @@
 interface Recommendation {
-  strategy: string;
+  strategy: string | null;
   priority_skill: string;
-  reason: string;
+  reason: string | null;
 }
 
 interface RecommendationCardProps {
@@ -45,7 +45,8 @@ export default function RecommendationCard({
         </p>
 
         <p className="mt-1 text-lg font-semibold capitalize">
-          {recommendation.strategy.replaceAll("_", " ")}
+          {recommendation.strategy?.replaceAll("_", " ") ??
+            "No data"}
         </p>
 
         <div className="mt-5">
@@ -54,7 +55,7 @@ export default function RecommendationCard({
           </p>
 
           <p className="mt-1 leading-7">
-            {recommendation.reason}
+            {recommendation.reason ?? "No data"}
           </p>
         </div>
       </div>

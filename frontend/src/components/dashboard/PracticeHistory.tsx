@@ -1,15 +1,9 @@
 import { Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
-interface PracticeItem {
-  task_id: number;
-  target_skill: string;
-  task_score: number;
-  created_at: string;
-}
+import type { PracticeHistoryItem } from "../../types/dashboard";
 
 interface PracticeHistoryProps {
-  history: PracticeItem[];
+  history: PracticeHistoryItem[];
 }
 
 export default function PracticeHistory({
@@ -39,7 +33,7 @@ export default function PracticeHistory({
         <tbody>
           {history.map((item) => (
             <tr
-              key={item.task_id}
+              key={`${item.task_id}-${item.created_at}`}
               className="border-b last:border-none"
             >
               <td className="py-4">
@@ -52,18 +46,23 @@ export default function PracticeHistory({
                   .replace(/\b\w/g, (c) => c.toUpperCase())}
               </td>
 
-              <td>#{item.task_id}</td>
+              <td>{item.task_id ? `#${item.task_id}` : "No task"}</td>
 
-              <td>{item.task_score}%</td>
+              <td>
+                {item.task_score !== undefined
+                  ? `${item.task_score}%`
+                  : "No score"}
+              </td>
 
               <td>
                 <span className="font-medium text-green-600">
-                  Completed
+                  {item.status ?? "Submitted"}
                 </span>
               </td>
 
               <td>
                 <button
+                disabled={!item.task_id}
                 onClick={() => navigate(`/practice/${item.task_id}`)}
                 className="rounded-lg p-2 hover:bg-gray-100"
               >
