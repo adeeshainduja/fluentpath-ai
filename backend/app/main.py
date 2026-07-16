@@ -16,6 +16,7 @@ from app.models.error_pattern import ErrorPattern
 from app.models.practice_attempt import PracticeAttempt
 from app.models.practice_task import PracticeTask
 from app.models.progress_metric import ProgressMetric
+from app.models.speaking_attempt import SpeakingAttempt
 
 
 # --------------------------------------------------
@@ -24,6 +25,12 @@ from app.models.progress_metric import ProgressMetric
 
 from app.api.practice import (
     router as practice_router,
+)
+from app.api.practice_history import (
+    router as practice_history_router,
+)
+from app.api.learner_intelligence import (
+    router as learner_intelligence_router,
 )
 
 from app.api.learning_plan import (
@@ -62,7 +69,6 @@ from app.api.practice_sessions import (
     router as practice_sessions_router,
 )
 from app.api.dashboard import router as dashboard_router
-print("Before import")
 
 from app.api.learning_path import (
     router as learning_path_router,
@@ -110,6 +116,8 @@ Base.metadata.create_all(bind=engine)
 # --------------------------------------------------
 
 app.include_router(practice_router)
+app.include_router(practice_history_router)
+app.include_router(learner_intelligence_router)
 app.include_router(learning_plan_router)
 app.include_router(hints_router)
 app.include_router(evaluations_router)

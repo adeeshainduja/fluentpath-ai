@@ -24,6 +24,10 @@ from app.services.practice_task_service import (
 from app.services.practice_evaluation_service import (
     evaluate_practice,
 )
+from app.services.gemini_service import (
+    GeminiConfigurationError,
+    GeminiServiceError,
+)
 
 router = APIRouter(
     prefix="/api/v1/practice-tasks",
@@ -149,10 +153,21 @@ def submit_task(
             detail=attempt["error"],
         )
 
-    evaluation = evaluate_practice(
-        db=db,
-        attempt_id=attempt.id,
-    )
+    try:
+        evaluation = evaluate_practice(
+            db=db,
+            attempt_id=attempt.id,
+        )
+    except GeminiConfigurationError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=str(exc),
+        ) from exc
+    except GeminiServiceError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=str(exc),
+        ) from exc
 
     return {
         "attempt": {
