@@ -12,13 +12,11 @@ import PracticeHistoryTable from "../../components/analytics/PracticeHistoryTabl
 import { useDashboard } from "../../hooks/useDashboard";
 
 export default function Analytics() {
-  const learnerId = 1;
-
   const {
     data,
     isLoading,
     error,
-  } = useDashboard(learnerId);
+  } = useDashboard();
 
   if (isLoading) {
     return (

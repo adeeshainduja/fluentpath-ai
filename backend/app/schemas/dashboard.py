@@ -6,6 +6,8 @@ from pydantic import BaseModel
 
 class DashboardSummary(BaseModel):
     average_score: float
+    daily_streak: int = 0
+    total_practices: int = 0
     completed_tasks: int
     pending_tasks: int
     learning_trend: str
@@ -30,12 +32,12 @@ class LearningTimeline(BaseModel):
 
 
 class PracticeHistory(BaseModel):
-    task_id: int
-    title: str
-    target_skill: str
-    practice_type: str
-    difficulty: str
-    status: str
+    task_id: int | None = None
+    title: str | None = None
+    target_skill: str | None = None
+    practice_type: str | None = None
+    difficulty: str | None = None
+    status: str | None = None
     strategy: Optional[str] = None
     created_at: datetime
 
@@ -91,3 +93,4 @@ class DashboardResponse(BaseModel):
     trend_analytics: TrendAnalytics
     weak_skills: List[WeakSkill]
     daily_missions: List[DailyMission]
+    achievement_badges: list[dict] = []

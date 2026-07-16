@@ -3,6 +3,7 @@ from fastapi import HTTPException, status
 
 from app.models.user import User
 from app.schemas.auth import (
+    ProfileUpdateRequest,
     RegisterRequest,
     UserResponse,
     TokenResponse,
@@ -11,6 +12,8 @@ from app.core.security import (
     hash_password,
     verify_password,
     create_access_token,
+    create_refresh_token,
+    decode_access_token,
 )
 
 from datetime import datetime, UTC
@@ -99,11 +102,90 @@ class AuthService:
                 "email": user.email,
             }
         )
+        refresh_token = create_refresh_token(
+            {
+                "sub": str(user.id),
+                "email": user.email,
+            }
+        )
 
         return TokenResponse(
             access_token=token,
+            refresh_token=refresh_token,
             user=UserResponse.model_validate(user),
         )
+
+    @staticmethod
+    def refresh(
+        db: Session,
+        refresh_token: str,
+    ) -> TokenResponse:
+        payload = decode_access_token(refresh_token)
+
+        if payload is None or payload.get("type") != "refresh":
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid refresh token.",
+            )
+
+        user_id = payload.get("sub")
+
+        try:
+            parsed_user_id = int(user_id)
+        except (TypeError, ValueError) as exc:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid refresh token.",
+            ) from exc
+
+        user = AuthService.get_user_by_id(
+            db=db,
+            user_id=parsed_user_id,
+        )
+
+        if user is None or not user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid refresh token.",
+            )
+
+        access_token = create_access_token(
+            {
+                "sub": str(user.id),
+                "email": user.email,
+            }
+        )
+        new_refresh_token = create_refresh_token(
+            {
+                "sub": str(user.id),
+                "email": user.email,
+            }
+        )
+
+        return TokenResponse(
+            access_token=access_token,
+            refresh_token=new_refresh_token,
+            user=UserResponse.model_validate(user),
+        )
+
+    @staticmethod
+    def update_profile(
+        db: Session,
+        user: User,
+        request: ProfileUpdateRequest,
+    ) -> UserResponse:
+        updates = request.model_dump(
+            exclude_unset=True,
+        )
+
+        for field, value in updates.items():
+            setattr(user, field, value)
+
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
+        return UserResponse.model_validate(user)
 
     @staticmethod
     def get_user_by_id(

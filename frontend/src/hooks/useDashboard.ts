@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { getDashboard } from "../api/dashboard";
 
-export const useDashboard = (learnerId: number) => {
+export const useDashboard = (learnerId?: number) => {
   return useQuery({
-    queryKey: ["dashboard", learnerId],
+    queryKey: ["dashboard", learnerId ?? "me"],
     queryFn: () => getDashboard(learnerId),
   });
 };

@@ -8,15 +8,16 @@ import {
 } from "lucide-react";
 import { useDashboard } from "../../hooks/useDashboard";
 import { useLearnerIntelligence } from "../../hooks/useLearnerIntelligence";
-
-const learnerId = 1;
+import { useAuth } from "../../hooks/useAuth";
 
 const formatLabel = (value?: string | null) =>
   value ? value.replaceAll("_", " ") : "No data";
 
 export default function Profile() {
+  const { user } = useAuth();
+  const learnerId = user?.id ?? 0;
   const intelligence = useLearnerIntelligence(learnerId);
-  const dashboard = useDashboard(learnerId);
+  const dashboard = useDashboard();
 
   if (intelligence.isLoading || dashboard.isLoading) {
     return (

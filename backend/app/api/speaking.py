@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.security import get_optional_current_user
+from app.models.user import User
 
 from app.schemas.speaking import (
     SpeakingSubmission,
@@ -33,10 +35,22 @@ router = APIRouter(
 )
 def evaluate(
     request: SpeakingSubmission,
+    current_user: User | None = Depends(get_optional_current_user),
     db: Session = Depends(get_db),
 ):
 
     transcript = request.transcript.strip()
+    learner_id = (
+        current_user.id
+        if current_user is not None
+        else request.learner_id
+    )
+
+    if learner_id is None:
+        raise HTTPException(
+            status_code=400,
+            detail="learner_id is required.",
+        )
 
     try:
         evaluation = evaluate_speaking(
@@ -55,7 +69,7 @@ def evaluate(
 
     attempt = save_speaking_attempt(
         db=db,
-        learner_id=request.learner_id,
+        learner_id=learner_id,
         transcript=transcript,
         evaluation=evaluation,
     )
@@ -63,9 +77,20 @@ def evaluate(
     feedback = build_speaking_feedback(
         evaluation,
     )
+    overall_score = round(
+        (
+            evaluation.grammar_score
+            + evaluation.vocabulary_score
+            + evaluation.fluency_score
+            + evaluation.pronunciation_score
+            + evaluation.confidence_score
+        )
+        / 5
+    )
 
     return {
         "attempt_id": attempt.id,
         "transcript": transcript,
+        "score": overall_score,
         **feedback,
     }

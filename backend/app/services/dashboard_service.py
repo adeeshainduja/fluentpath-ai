@@ -9,6 +9,7 @@ from app.models.progress_metric import ProgressMetric
 from app.services.weak_skills_service import get_weak_skills
 from app.services.daily_mission_service import generate_daily_mission
 from app.services.achievement_service import get_achievement_badges
+from app.services.streak_service import calculate_learning_streak
 
 from app.services.adaptive_priority_service import (
     calculate_adaptive_priorities,
@@ -86,6 +87,13 @@ def get_dashboard_summary(
         "average_score": round(
             average_score,
             2,
+        ),
+        "daily_streak": calculate_learning_streak(
+            db=db,
+            learner_id=learner_id,
+        ),
+        "total_practices": (
+            completed_tasks + pending_tasks
         ),
         "completed_tasks": completed_tasks,
         "pending_tasks": pending_tasks,

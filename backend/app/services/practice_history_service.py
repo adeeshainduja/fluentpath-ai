@@ -60,6 +60,7 @@ def _get_practice_attempt_items(
         )
         .filter(
             PracticeAttempt.learner_id == learner_id,
+            PracticeAttempt.practice_type != "speaking",
         )
         .all()
     )

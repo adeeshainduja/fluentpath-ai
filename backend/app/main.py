@@ -13,6 +13,13 @@ from app.core.database import Base, engine
 from app.models.analysis import Analysis
 from app.models.correction_state import CorrectionState
 from app.models.error_pattern import ErrorPattern
+from app.models.evaluation_records import (
+    Achievement,
+    ListeningEvaluation,
+    SpeakingEvaluation,
+    VocabularyProgress,
+    WritingEvaluation,
+)
 from app.models.practice_attempt import PracticeAttempt
 from app.models.practice_task import PracticeTask
 from app.models.progress_metric import ProgressMetric
@@ -83,6 +90,7 @@ from app.api.recommendations import (
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.auth import router as auth_router
+from app.api.user_management import router as user_management_router
 
 from app.models.user import User
 
@@ -101,9 +109,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-    ],
+    allow_origin_regex=r"http://localhost:\d+",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -136,6 +142,7 @@ app.include_router(learning_path_router)
 app.include_router(speaking_router)
 app.include_router(recommendation_router)
 app.include_router(auth_router)
+app.include_router(user_management_router)
 
 # --------------------------------------------------
 # Root endpoint

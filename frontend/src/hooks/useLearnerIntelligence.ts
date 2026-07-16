@@ -11,6 +11,7 @@ export const useLearnerIntelligence = (
     ],
     queryFn: () =>
       getLearnerIntelligence(learnerId),
+    enabled: learnerId > 0,
     staleTime: 1000 * 60 * 5,
   });
 };

@@ -1,5 +1,7 @@
 export interface DashboardSummary {
   average_score: number;
+  daily_streak: number;
+  total_practices: number;
   completed_tasks: number;
   pending_tasks: number;
   learning_trend: string;

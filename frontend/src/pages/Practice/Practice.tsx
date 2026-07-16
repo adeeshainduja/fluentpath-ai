@@ -7,10 +7,11 @@ import {
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 
 import RecommendedPractice from "../../components/practice/RecommendedPractice";
 import { useRecommendation } from "../../hooks/useRecommendation";
+import api from "../../api/axios";
+import { useAuth } from "../../hooks/useAuth";
 
 const practiceTypes = [
   {
@@ -47,18 +48,27 @@ const practiceTypes = [
 
 export default function Practice() {
   const navigate = useNavigate();
-
-  const learnerId = 1;
+  const { user } = useAuth();
 
   const {
     data: recommendation,
     isLoading,
-  } = useRecommendation(learnerId);
+  } = useRecommendation(user?.id ?? 0);
 
-  const startPractice = async () => {
+  const startPractice = async (practiceType: string) => {
+    if (practiceType === "Speaking") {
+      navigate("/practice/speaking");
+      return;
+    }
+
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/v1/practice-tasks/learners/1/generate"
+      const response = await api.post(
+        `/practice-tasks/learners/${user.id}/generate`
       );
 
       navigate(`/practice/${response.data.id}`);
@@ -119,7 +129,7 @@ export default function Practice() {
               </p>
 
               <button
-                onClick={startPractice}
+                onClick={() => startPractice(item.title)}
                 className="mt-6 w-full rounded-xl bg-[#3D348B] py-3 font-semibold text-white transition hover:bg-[#2d2770]"
               >
                 Start Practice

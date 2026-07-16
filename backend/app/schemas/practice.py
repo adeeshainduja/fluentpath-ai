@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 
 
 class PracticeAttemptCreate(BaseModel):
-    learner_id: int = Field(gt=0)
+    learner_id: int | None = Field(default=None, gt=0)
     text: str = Field(min_length=1)
 
 

@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 
 
 class SpeakingSubmission(BaseModel):
-    learner_id: int = Field(gt=0)
+    learner_id: int | None = Field(default=None, gt=0)
     transcript: str = Field(min_length=1)
 
 
@@ -32,6 +32,7 @@ class SpeakingEvaluation(BaseModel):
 class SpeakingResponse(BaseModel):
     attempt_id: int
     transcript: str
+    score: int
     pronunciation: PronunciationResult
     evaluation: SpeakingEvaluation
     coach_message: str

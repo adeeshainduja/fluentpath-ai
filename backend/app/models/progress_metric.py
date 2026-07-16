@@ -22,7 +22,7 @@ class ProgressMetric(Base):
     )
 
     learner_id: Mapped[int] = mapped_column(
-        Integer,
+        ForeignKey("users.id"),
         nullable=False,
         index=True,
     )

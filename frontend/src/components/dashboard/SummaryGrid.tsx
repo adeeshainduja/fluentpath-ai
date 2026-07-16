@@ -9,7 +9,7 @@ export default function SummaryGrid({
   summary,
 }: SummaryGridProps) {
   return (
-    <div className="grid grid-cols-4 gap-6">
+    <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-5">
       <SummaryCard
         title="Average Score"
         value={`${summary.average_score}%`}
@@ -17,8 +17,13 @@ export default function SummaryGrid({
       />
 
       <SummaryCard
-        title="Completed Tasks"
-        value={summary.completed_tasks}
+        title="Daily Streak"
+        value={`${summary.daily_streak} days`}
+      />
+
+      <SummaryCard
+        title="Total Practices"
+        value={summary.total_practices}
       />
 
       <SummaryCard

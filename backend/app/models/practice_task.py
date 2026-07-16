@@ -2,6 +2,7 @@ from datetime import datetime
 
 from sqlalchemy import (
     DateTime,
+    ForeignKey,
     Integer,
     String,
     Text,
@@ -21,7 +22,7 @@ class PracticeTask(Base):
     )
 
     learner_id: Mapped[int] = mapped_column(
-        Integer,
+        ForeignKey("users.id"),
         nullable=False,
         index=True,
     )

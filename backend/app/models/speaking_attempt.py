@@ -2,6 +2,7 @@ from datetime import datetime
 
 from sqlalchemy import (
     DateTime,
+    ForeignKey,
     Integer,
     String,
     Text,
@@ -10,6 +11,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import (
     Mapped,
     mapped_column,
+    relationship,
 )
 
 from app.core.database import Base
@@ -25,7 +27,7 @@ class SpeakingAttempt(Base):
     )
 
     learner_id: Mapped[int] = mapped_column(
-        Integer,
+        ForeignKey("users.id"),
         nullable=False,
         index=True,
     )
@@ -68,4 +70,9 @@ class SpeakingAttempt(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
         default=datetime.utcnow,
+    )
+
+    user = relationship(
+        "User",
+        back_populates="speaking_attempts",
     )

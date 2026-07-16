@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, Integer, String, UniqueConstraint
+from sqlalchemy import DateTime, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
@@ -24,7 +24,7 @@ class ErrorPattern(Base):
     )
 
     learner_id: Mapped[int] = mapped_column(
-        Integer,
+        ForeignKey("users.id"),
         nullable=False,
         index=True,
     )

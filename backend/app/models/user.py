@@ -7,6 +7,8 @@ from sqlalchemy import (
     func,
 )
 
+from sqlalchemy.orm import relationship
+
 from app.core.database import Base
 
 
@@ -20,6 +22,26 @@ class User(Base):
     email = Column(String(255), unique=True, nullable=False, index=True)
 
     password_hash = Column(String(255), nullable=False)
+
+    profile_photo_url = Column(String(500), nullable=True)
+
+    english_level = Column(
+        String(30),
+        nullable=False,
+        default="Beginner",
+    )
+
+    target_goal = Column(
+        String(255),
+        nullable=False,
+        default="Improve English communication",
+    )
+
+    daily_goal = Column(
+        Integer,
+        nullable=False,
+        default=15,
+    )
 
     role = Column(
         String(30),
@@ -49,4 +71,14 @@ class User(Base):
     last_login = Column(
         DateTime(timezone=True),
         nullable=True,
+    )
+
+    practice_attempts = relationship(
+        "PracticeAttempt",
+        back_populates="user",
+    )
+
+    speaking_attempts = relationship(
+        "SpeakingAttempt",
+        back_populates="user",
     )
