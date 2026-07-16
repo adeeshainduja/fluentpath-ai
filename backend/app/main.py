@@ -82,6 +82,10 @@ from app.api.recommendations import (
 
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.auth import router as auth_router
+
+from app.models.user import User
+
 # --------------------------------------------------
 # FastAPI application
 # --------------------------------------------------
@@ -131,6 +135,7 @@ app.include_router(dashboard_router)
 app.include_router(learning_path_router)
 app.include_router(speaking_router)
 app.include_router(recommendation_router)
+app.include_router(auth_router)
 
 # --------------------------------------------------
 # Root endpoint

@@ -1,0 +1,508 @@
+This design is **very good** for FluentPath. It already matches your current UI (purple theme, clean cards, rounded corners), so I'd use it with only a few changes to fit your project.
+
+## Phase 1: UI (Now)
+
+Build this page exactly as shown.
+
+### Left Side
+
+* FluentPath AI illustration (or your own hero graphic)
+* Short tagline:
+
+  * **"Practice. Improve. Speak with Confidence."**
+* Light gradient background.
+
+### Right Side
+
+* FluentPath AI logo
+* Welcome Back
+* Email
+* Password
+* Remember Me
+* Sign In button
+* Google Sign In (optional)
+* Microsoft Sign In (optional)
+* Create Account link
+
+At this stage, the Google/Microsoft buttons can simply show **"Coming Soon"** or be disabled if you haven't implemented OAuth yet.
+
+---
+
+## Phase 2: Authentication (Backend)
+
+Use JWT authentication.
+
+### Database
+
+```text
+User
+-----
+id
+name
+email
+password_hash
+created_at
+last_login
+```
+
+### FastAPI Endpoints
+
+```text
+POST /auth/register
+
+POST /auth/login
+
+POST /auth/logout
+
+GET /auth/me
+
+POST /auth/refresh
+```
+
+---
+
+## Phase 3: Frontend
+
+Create these pages:
+
+```text
+/pages
+    Login/
+    Register/
+    ForgotPassword/
+```
+
+Add an auth context:
+
+```text
+contexts/
+    AuthContext.tsx
+```
+
+Create an auth service:
+
+```text
+services/
+    authApi.ts
+```
+
+Create a hook:
+
+```text
+hooks/
+    useAuth.ts
+```
+
+---
+
+## Phase 4: Protect Routes
+
+Your routing should become:
+
+```text
+/login
+
+/register
+
+----------------------
+
+Protected
+
+/
+
+practice
+
+analytics
+
+learning-path
+
+ai-coach
+
+profile
+
+settings
+```
+
+If the user isn't logged in:
+
+```
+→ redirect to /login
+```
+
+---
+
+## Phase 5: After Login
+
+Instead of hardcoding:
+
+```text
+Learner ID = 1
+```
+
+you should use the authenticated user's ID from the JWT.
+
+For example, replace:
+
+```ts
+const learnerId = 1;
+```
+
+with something like:
+
+```ts
+const { user } = useAuth();
+
+const learnerId = user.id;
+```
+
+This will make your Dashboard, Profile, Analytics, Learning Path, and AI Coach automatically show data for the logged-in learner.
+
+---
+
+# I also noticed something
+
+Your current sidebar shows:
+
+```
+Adeesha
+Student
+```
+
+That should come from the logged-in user.
+
+After login, it should display:
+
+* Name
+* Email (optional)
+* Avatar (optional)
+* CEFR Level (nice addition)
+
+---
+
+# My recommendation
+
+Don't implement Google or Microsoft login yet. They add complexity (OAuth flows, callback URLs, provider setup) and aren't necessary for a strong final-year project.
+
+Focus on:
+
+1. ✅ Email/password login
+2. ✅ JWT authentication
+3. ✅ Protected routes
+4. ✅ Current user endpoint (`/auth/me`)
+5. ✅ Replace all hardcoded `learnerId = 1` with the authenticated user's ID
+
+That gives you a complete authentication system that's much easier to maintain.
+
+---
+
+## One more thing
+
+I extracted the design you uploaded, and it fits FluentPath very well. I would keep the layout almost exactly as it is, with only these small tweaks:
+
+* Replace the stock AI illustration with a FluentPath-themed illustration if you have one.
+* Add a short motivational tagline on the left.
+* Make the Sign In button use the same purple (`#3D348B`) as the rest of your application.
+* Hide or disable the Google/Microsoft buttons until OAuth is implemented.
+
+It will look like a cohesive part of your application rather than a generic login screen.
+
+
+
+
+That's exactly the direction I'd take. At this point, **authentication should be the next major milestone** because everything else (Profile, Dashboard, Learning Path, AI Coach) should be tied to the logged-in user instead of `learnerId = 1`.
+
+## Authentication Architecture
+
+### Backend (FastAPI)
+
+Create a dedicated authentication module:
+
+```text
+backend/app/
+│
+├── api/
+│   └── auth.py
+│
+├── models/
+│   └── user.py
+│
+├── schemas/
+│   └── auth.py
+│
+├── services/
+│   └── auth_service.py
+│
+├── core/
+│   ├── security.py
+│   └── auth.py
+```
+
+---
+
+## Database
+
+```sql
+users
+-----
+id
+name
+email
+password_hash
+created_at
+updated_at
+last_login
+is_active
+```
+
+Don't store passwords—only hashed passwords (e.g. with bcrypt).
+
+---
+
+## Backend Endpoints
+
+```text
+POST   /api/v1/auth/register
+
+POST   /api/v1/auth/login
+
+GET    /api/v1/auth/me
+
+POST   /api/v1/auth/logout
+
+POST   /api/v1/auth/refresh
+```
+
+---
+
+## JWT Flow
+
+```text
+User
+
+↓
+
+Login
+
+↓
+
+Validate Email + Password
+
+↓
+
+Generate JWT
+
+↓
+
+Return
+
+{
+   access_token,
+   token_type,
+   user
+}
+
+↓
+
+Frontend stores token
+
+↓
+
+Every API request
+
+Authorization:
+Bearer <token>
+
+↓
+
+FastAPI
+
+↓
+
+Current User
+
+↓
+
+Dashboard
+
+Profile
+
+Analytics
+
+Learning Path
+```
+
+---
+
+# Frontend
+
+Create:
+
+```text
+src/
+│
+├── context/
+│     AuthContext.tsx
+│
+├── hooks/
+│     useAuth.ts
+│
+├── services/
+│     authApi.ts
+│
+├── pages/
+│     Login/
+│     Register/
+│
+├── components/
+│     ProtectedRoute.tsx
+```
+
+---
+
+# Auth Context
+
+The context should expose:
+
+```ts
+user
+
+token
+
+login()
+
+logout()
+
+register()
+
+loading
+
+isAuthenticated
+```
+
+Every page can then access:
+
+```ts
+const { user } = useAuth();
+```
+
+---
+
+# Replace every hardcoded learner
+
+Today you have:
+
+```ts
+const learnerId = 1;
+```
+
+Replace it with:
+
+```ts
+const { user } = useAuth();
+
+const learnerId = user.id;
+```
+
+You'll need to update pages like:
+
+* Dashboard
+* Practice
+* Analytics
+* Learning Path
+* AI Coach
+* Profile
+
+so they all use the authenticated user's ID.
+
+---
+
+# Protected Routes
+
+Create a `ProtectedRoute` component.
+
+Instead of allowing anyone to visit:
+
+```text
+/
+
+/profile
+
+/analytics
+```
+
+wrap them:
+
+```tsx
+<ProtectedRoute>
+    <Dashboard />
+</ProtectedRoute>
+```
+
+If the user isn't logged in:
+
+```
+→ Redirect to /login
+```
+
+---
+
+# Sidebar
+
+Instead of:
+
+```
+Adeesha
+Student
+```
+
+Display the logged-in user's information:
+
+```
+John Doe
+
+john@email.com
+
+B1 Intermediate
+```
+
+---
+
+# Login Page
+
+Since you already have a good UI design, keep it simple:
+
+* Email
+* Password
+* Remember me
+* Sign In button
+* Link to Register
+* Link to Forgot Password (optional)
+
+Don't implement Google or Microsoft OAuth yet. You can add those later if needed.
+
+---
+
+# Recommended implementation order
+
+1. **Backend**
+
+   * User model
+   * JWT authentication
+   * Register endpoint
+   * Login endpoint
+   * `/auth/me`
+
+2. **Frontend**
+
+   * Login page
+   * Register page
+   * Auth context
+   * Protected routes
+
+3. **Integration**
+
+   * Replace `learnerId = 1`
+   * Display logged-in user in the sidebar
+   * Update all pages to use the authenticated user
+
+Once that's done, the rest of the project will naturally become multi-user and your existing intelligence layer will work for whichever learner is signed in. This is a solid foundation for the final stage of FluentPath AI.
