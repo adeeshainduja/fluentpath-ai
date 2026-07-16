@@ -38,14 +38,14 @@ export default function Analytics() {
 
   const getSkillScore = (skill: string) =>
     data.skill_progress.find(
-      (item: { skill: string; }) =>
+      (item) =>
         item.skill.toLowerCase() ===
         skill.toLowerCase()
     )?.average_score ?? 0;
 
   const progressData =
     data.learning_timeline.map(
-      (item: { date: string; average_score: number }) => ({
+      (item) => ({
         date: item.date,
         score: item.average_score,
       })
@@ -53,7 +53,7 @@ export default function Analytics() {
 
   const weeklyActivity =
     data.learning_timeline.map(
-      (item: { date: string; average_score: number }) => ({
+      (item) => ({
         day: new Date(
           item.date
         ).toLocaleDateString(
@@ -68,7 +68,7 @@ export default function Analytics() {
 
   const history =
     data.practice_history.map(
-      (item: { created_at: string; target_skill: string; task_score: number | undefined; status: string | undefined }) => ({
+      (item) => ({
         date: new Date(
           item.created_at
         ).toLocaleDateString(),
@@ -148,10 +148,12 @@ export default function Analytics() {
                 "General",
 
               strategy:
-                data.recommendations.strategy,
+                data.recommendations.strategy ??
+                "No data",
 
               reason:
-                data.recommendations.reason,
+                data.recommendations.reason ??
+                "No data",
             }}
           />
 
