@@ -17,6 +17,7 @@ def create_writing_attempt(
 ) -> PracticeAttempt:
 
     new_attempt = PracticeAttempt(
+        learner_id=attempt.learner_id,
         text=attempt.text,
         practice_type="writing",
     )
@@ -86,6 +87,8 @@ def create_retry_attempt(
         return None
 
     retry_attempt = PracticeAttempt(
+        learner_id=original_attempt.learner_id,
+        task_id=original_attempt.task_id,
         text=retry_data.text,
         practice_type=original_attempt.practice_type,
         parent_attempt_id=original_attempt.id,
