@@ -21,7 +21,7 @@ import AICoach from "../pages/AICoach/AICoach";
 import Profile from "../pages/Profile/Profile";
 //import History from "../pages/History/History";
 import Settings from "../pages/Settings/Settings";
-import ReadingPractice from "../pages/Practice/ReadingPractice";
+import ReadingPractice from "../pages/Reading/ReadingPractice";
 
 export default function AppRouter() {
   return (
@@ -62,6 +62,11 @@ export default function AppRouter() {
             element={<SpeakingPractice />}
           />
 
+          <Route
+            path="/practice/reading"
+            element={<ReadingPractice />}
+          />
+
           {/* Practice Details */}
           <Route
             path="/practice/:id"
@@ -96,12 +101,6 @@ export default function AppRouter() {
             path="/settings"
             element={<Settings />}
           />
-          <Route
-            path="/practice/reading"
-            element={<ReadingPractice />}
-          />
-
-
           </Route>
         </Route>
 

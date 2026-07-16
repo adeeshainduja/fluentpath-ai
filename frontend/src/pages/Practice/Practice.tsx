@@ -61,6 +61,11 @@ export default function Practice() {
       return;
     }
 
+    if (practiceType === "Reading") {
+      navigate("/practice/reading");
+      return;
+    }
+
     if (!user) {
       navigate("/login");
       return;
