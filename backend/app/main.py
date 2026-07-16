@@ -86,6 +86,9 @@ from app.api.speaking import (
 from app.api.reading import (
     router as reading_router,
 )
+from app.api.listening import (
+    router as listening_router,
+)
 from app.api.recommendations import (
     router as recommendation_router,
 )
@@ -144,6 +147,7 @@ app.include_router(dashboard_router)
 app.include_router(learning_path_router)
 app.include_router(speaking_router)
 app.include_router(reading_router)
+app.include_router(listening_router)
 app.include_router(recommendation_router)
 app.include_router(auth_router)
 app.include_router(user_management_router)
