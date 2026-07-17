@@ -4,8 +4,8 @@ import type {
   LoginRequest,
   RegisterRequest,
   LoginResponse,
-  ProfileUpdateRequest,
   User,
+  ProfileUpdateRequest,
 } from "../types/auth";
 
 /**
@@ -47,19 +47,9 @@ export async function getCurrentUser(): Promise<User> {
   return response.data;
 }
 
-export async function refreshToken(
-  refresh_token: string
-): Promise<LoginResponse> {
-  const response = await api.post<LoginResponse>(
-    "/auth/refresh",
-    {
-      refresh_token,
-    }
-  );
-
-  return response.data;
-}
-
+/**
+ * Update current user profile
+ */
 export async function updateProfile(
   data: ProfileUpdateRequest
 ): Promise<User> {
