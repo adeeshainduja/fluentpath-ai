@@ -71,6 +71,11 @@ export default function Practice() {
       return;
     }
 
+    if (practiceType === "Vocabulary") {
+      navigate("/practice/vocabulary");
+      return;
+    }
+
     if (!user) {
       navigate("/login");
       return;
