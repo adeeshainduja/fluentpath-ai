@@ -23,6 +23,7 @@ import Profile from "../pages/Profile/Profile";
 import Settings from "../pages/Settings/Settings";
 import ReadingPractice from "../pages/Reading/ReadingPractice";
 import ListeningPractice from "../pages/Listening/ListeningPractice";
+import VocabularyPractice from "../pages/Vocabulary/VocabularyPractice";
 
 export default function AppRouter() {
   return (
@@ -71,6 +72,10 @@ export default function AppRouter() {
           <Route
             path="/practice/listening"
             element={<ListeningPractice />}
+          />
+          <Route
+            path="/practice/vocabulary"
+            element={<VocabularyPractice />}
           />
 
           {/* Practice Details */}
