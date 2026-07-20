@@ -1,4 +1,10 @@
-export interface DashboardSummary {
+export interface DashboardWeeklyProgress {
+  completed: number;
+  target: number;
+  percentage: number;
+}
+
+export interface LegacyDashboardSummary {
   average_score: number;
   daily_streak: number;
   total_practices: number;
@@ -9,7 +15,7 @@ export interface DashboardSummary {
   recommended_strategy: string | null;
 }
 
-export interface SkillProgress {
+export interface LegacySkillProgress {
   skill: string;
   total_attempts: number;
   average_score: number;
@@ -19,13 +25,13 @@ export interface SkillProgress {
   trend: string;
 }
 
-export interface TimelineItem {
+export interface LegacyTimelineItem {
   date: string;
   practice_count: number;
   average_score: number;
 }
 
-export interface PracticeHistoryItem {
+export interface LegacyPracticeHistoryItem {
   task_id: number;
   title?: string;
   target_skill: string;
@@ -37,34 +43,70 @@ export interface PracticeHistoryItem {
   created_at: string;
 }
 
-export interface Recommendation {
+export interface LegacyRecommendation {
   strategy: string | null;
   priority_skill?: string | null;
   selected_skill?: string | null;
   reason: string | null;
 }
 
-export interface WeakSkill {
-  skill: string;
-  score: number;
-  priority: string;
-  recommendation: string;
-}
-
-export interface ErrorStatistics {
+export interface LegacyErrorStatistics {
   total_errors: number;
   active_errors?: number;
   resolved_errors?: number;
   error_distribution: Record<string, unknown>;
 }
 
-export interface TrendAnalytics {
+export interface LegacyTrendAnalytics {
   trend: string;
   average_score: number;
   recent_average: number;
   highest_score?: number;
   lowest_score?: number;
   total_attempts?: number;
+}
+
+export interface DashboardAchievement {
+  title: string;
+  description: string | null;
+  earned: boolean;
+  icon: string;
+}
+
+export interface DashboardPracticeItem {
+  task_id: number | null;
+  title: string | null;
+  practice_type: string | null;
+  target_skill: string | null;
+  score: number | null;
+  created_at: string;
+}
+
+export interface DashboardResponse {
+  learner_name: string;
+  total_practices: number;
+  average_score: number;
+  reading_score: number;
+  listening_score: number;
+  speaking_score: number;
+  writing_score: number;
+  vocabulary_score: number;
+  daily_streak: number;
+  weekly_goal_progress: DashboardWeeklyProgress;
+  completed_practices_this_week: number;
+  achievements: DashboardAchievement[];
+  latest_practice: DashboardPracticeItem | null;
+  ai_recommendation_summary: string | null;
+  summary: LegacyDashboardSummary;
+  skill_progress: LegacySkillProgress[];
+  learning_timeline: LegacyTimelineItem[];
+  practice_history: LegacyPracticeHistoryItem[];
+  recommendations: LegacyRecommendation;
+  error_statistics: LegacyErrorStatistics;
+  trend_analytics: LegacyTrendAnalytics;
+  weak_skills: WeakSkill[];
+  daily_missions: DailyMission[];
+  achievement_badges: DashboardAchievement[];
 }
 
 export interface DailyMission {
@@ -74,31 +116,9 @@ export interface DailyMission {
   priority: number;
 }
 
-export interface AchievementBadge {
-  title: string;
-  description: string;
-  earned: boolean;
-  icon: string;
-}
-
-export interface DashboardResponse {
-  summary: DashboardSummary;
-
-  skill_progress: SkillProgress[];
-
-  learning_timeline: TimelineItem[];
-
-  practice_history: PracticeHistoryItem[];
-
-  recommendations: Recommendation;
-
-  error_statistics: ErrorStatistics;
-
-  trend_analytics: TrendAnalytics;
-
-  weak_skills: WeakSkill[];
-
-  daily_missions: DailyMission[];
-
-  achievement_badges: AchievementBadge[];
+export interface WeakSkill {
+  skill: string;
+  score: number;
+  priority: string;
+  recommendation: string;
 }
