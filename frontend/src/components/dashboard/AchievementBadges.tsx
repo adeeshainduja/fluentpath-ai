@@ -1,8 +1,8 @@
 import { Award, BookOpen, Flame } from "lucide-react";
-import type { AchievementBadge } from "../../types/dashboard";
+import type { DashboardAchievement } from "../../types/dashboard";
 
 interface Props {
-  badges?: AchievementBadge[];
+  badges?: DashboardAchievement[];
 }
 
 const icons = {
@@ -11,9 +11,7 @@ const icons = {
   book: BookOpen,
 };
 
-export default function AchievementBadges({
-  badges = [],
-}: Props) {
+export default function AchievementBadges({ badges = [] }: Props) {
   return (
     <div className="rounded-3xl bg-white p-6 shadow-sm">
       <h2 className="mb-6 text-xl font-bold text-[#3D348B]">
@@ -21,14 +19,11 @@ export default function AchievementBadges({
       </h2>
 
       {badges.length === 0 ? (
-        <p className="text-gray-500">
-          No achievements yet.
-        </p>
+        <p className="text-gray-500">No achievements yet.</p>
       ) : (
         <div className="space-y-4">
           {badges.map((badge) => {
-            const Icon =
-              icons[badge.icon as keyof typeof icons] ?? Award;
+            const Icon = icons[badge.icon as keyof typeof icons] ?? Award;
 
             return (
               <div
@@ -41,20 +36,12 @@ export default function AchievementBadges({
               >
                 <Icon
                   size={24}
-                  className={
-                    badge.earned
-                      ? "text-green-600"
-                      : "text-gray-400"
-                  }
+                  className={badge.earned ? "text-green-600" : "text-gray-400"}
                 />
-
                 <div>
-                  <h3 className="font-semibold">
-                    {badge.title}
-                  </h3>
-
+                  <h3 className="font-semibold">{badge.title}</h3>
                   <p className="text-sm text-gray-500">
-                    {badge.description}
+                    {badge.description ?? "Achievement unlocked"}
                   </p>
                 </div>
               </div>
