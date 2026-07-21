@@ -98,21 +98,27 @@ def update_profile(
     response_model=PracticeHistoryResponse,
 )
 def history(
+    page: int = Query(
+        default=1,
+        ge=1,
+    ),
     limit: int = Query(
         default=50,
         ge=1,
         le=100,
     ),
-    offset: int = Query(
-        default=0,
-        ge=0,
-    ),
+    type: str = Query(default="all"),
+    sort: str = Query(default="newest"),
+    search: str | None = Query(default=None),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     return get_practice_history(
         db=db,
         learner_id=current_user.id,
+        page=page,
         limit=limit,
-        offset=offset,
+        practice_type=type,  # compatibility endpoint
+        sort=sort,
+        search=search,
     )

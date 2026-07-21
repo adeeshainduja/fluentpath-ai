@@ -6,64 +6,61 @@ from pydantic import BaseModel, Field
 
 PracticeHistoryType = Literal[
     "all",
+    "reading",
+    "listening",
     "writing",
     "speaking",
+    "vocabulary",
 ]
+
+PracticeHistorySort = Literal["newest", "oldest", "score_desc", "score_asc"]
 
 
 class PracticeHistoryItem(BaseModel):
-    record_id: str
-    source: Literal[
-        "practice_attempt",
-        "speaking_attempt",
-    ]
-
     attempt_id: int
-    learner_id: int
     practice_type: str
-
-    task_id: int | None = None
-    task_title: str | None = None
-    target_skill: str | None = None
-    difficulty: str | None = None
-    status: str | None = None
-    strategy: str | None = None
-
-    attempt_number: int | None = None
-    submitted_text: str
-
+    title: str
+    completed_date: datetime
     score: int | None = None
-    grammar_score: int | None = None
-    vocabulary_score: int | None = None
-    fluency_score: int | None = None
-    pronunciation_score: int | None = None
-    confidence_score: int | None = None
-
-    feedback: str | None = None
-    has_evaluation: bool
-    created_at: datetime
+    duration: int | None = None
+    difficulty: str | None = None
+    feedback_summary: str | None = None
+    status: str
+    target_skill: str | None = None
 
 
-class PracticeHistorySummary(BaseModel):
-    learner_id: int
-    total_practices: int
-    writing_practices: int
-    speaking_practices: int
-    evaluated_practices: int
-    average_score: float | None = None
-    best_score: int | None = None
-    latest_score: int | None = None
-    latest_practice_at: datetime | None = None
+class PracticeHistoryDetail(BaseModel):
+    attempt_id: int
+    practice_type: str
+    title: str
+    completed_date: datetime
+    score: int | None = None
+    duration: int | None = None
+    difficulty: str | None = None
+    status: str
+    original_practice: dict
+    learner_answers: dict
+    correct_answers: dict | None = None
+    explanations: dict | None = None
+    ai_feedback: str | None = None
+    feedback_summary: str | None = None
+    weaknesses: list[str] = Field(default_factory=list)
+    strengths: list[str] = Field(default_factory=list)
+    completion_time: datetime | None = None
+    suggestions: list[str] = Field(default_factory=list)
 
 
 class PracticeHistoryResponse(BaseModel):
-    learner_id: int
     total: int
+    page: int
     limit: int = Field(ge=1, le=100)
-    offset: int = Field(ge=0)
     items: list[PracticeHistoryItem]
 
 
 class PracticeHistoryDetailResponse(BaseModel):
-    summary: PracticeHistorySummary
-    history: PracticeHistoryResponse
+    history: PracticeHistoryDetail
+
+
+class PracticeHistoryExportResponse(BaseModel):
+    total: int
+    items: list[PracticeHistoryItem]

@@ -19,7 +19,8 @@ import Analytics from "../pages/Analytics/Analytics";
 import LearningPath from "../pages/LearningPath/LearningPath";
 import AICoach from "../pages/AICoach/AICoach";
 import Profile from "../pages/Profile/Profile";
-//import History from "../pages/History/History";
+import History from "../pages/History/History";
+import HistoryDetail from "../pages/History/HistoryDetail";
 import Settings from "../pages/Settings/Settings";
 import ReadingPractice from "../pages/Reading/ReadingPractice";
 import ListeningPractice from "../pages/Listening/ListeningPractice";
@@ -103,10 +104,14 @@ export default function AppRouter() {
             element={<Profile />}
           />
 
-          {/* <Route
+          <Route
             path="/history"
             element={<History />}
-          /> */}
+          />
+          <Route
+            path="/history/:attemptId"
+            element={<HistoryDetail />}
+          />
 
           <Route
             path="/settings"
