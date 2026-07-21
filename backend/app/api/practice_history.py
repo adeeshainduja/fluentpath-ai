@@ -2,12 +2,15 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.security import get_current_user
+from app.models.user import User
 from app.schemas.practice_history import (
+    PracticeHistoryDetailResponse,
     PracticeHistoryResponse,
-    PracticeHistorySummary,
     PracticeHistoryType,
 )
 from app.services.practice_history_service import (
+    get_practice_history_detail,
     get_practice_history,
     get_practice_history_summary,
 )
@@ -20,43 +23,49 @@ router = APIRouter(
 
 
 @router.get(
-    "/learners/{learner_id}",
+    "",
     response_model=PracticeHistoryResponse,
 )
 def learner_practice_history(
-    learner_id: int,
+    current_user: User = Depends(get_current_user),
+    page: int = Query(default=1, ge=1),
     limit: int = Query(
         default=20,
         ge=1,
         le=100,
     ),
-    offset: int = Query(
-        default=0,
-        ge=0,
-    ),
-    practice_type: PracticeHistoryType = "all",
+    type: PracticeHistoryType = Query(default="all", alias="type"),
+    sort: str = Query(default="newest"),
+    search: str | None = Query(default=None),
     db: Session = Depends(get_db),
 ):
     return get_practice_history(
         db=db,
-        learner_id=learner_id,
+        learner_id=current_user.id,
+        page=page,
         limit=limit,
-        offset=offset,
-        practice_type=practice_type,
+        practice_type=type,
+        sort=sort,
+        search=search,
     )
 
 
 @router.get(
-    "/learners/{learner_id}/summary",
-    response_model=PracticeHistorySummary,
+    "/{attempt_id}",
+    response_model=PracticeHistoryDetailResponse,
 )
-def learner_practice_history_summary(
-    learner_id: int,
-    practice_type: PracticeHistoryType = "all",
+def learner_practice_history_detail(
+    attempt_id: int,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    return get_practice_history_summary(
+    detail = get_practice_history_detail(
         db=db,
-        learner_id=learner_id,
-        practice_type=practice_type,
+        learner_id=current_user.id,
+        attempt_id=attempt_id,
     )
+    if detail is None:
+        from fastapi import HTTPException
+
+        raise HTTPException(status_code=404, detail="Practice history not found")
+    return detail
