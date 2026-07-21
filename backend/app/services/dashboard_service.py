@@ -24,6 +24,7 @@ from app.services.achievement_service import get_achievement_badges
 from app.services.practice_strategy_service import determine_practice_strategy
 from app.services.adaptive_priority_service import calculate_adaptive_priorities
 from app.services.analytics_service import get_user_analytics
+from app.services.practice_history_service import get_practice_history_items
 
 
 def _round_score(value: float | None) -> float:
@@ -90,37 +91,20 @@ def _get_weekly_progress(db: Session, learner_id: int) -> tuple[int, int, float]
 
 
 def _get_latest_practice(db: Session, learner_id: int):
-    latest_task = (
-        db.query(PracticeTask, PracticeAttempt, ProgressMetric)
-        .join(
-            PracticeAttempt,
-            PracticeAttempt.task_id == PracticeTask.id,
-        )
-        .outerjoin(
-            ProgressMetric,
-            ProgressMetric.attempt_id == PracticeAttempt.id,
-        )
-        .filter(
-            PracticeTask.learner_id == learner_id,
-            PracticeTask.status == "completed",
-        )
-        .order_by(PracticeTask.created_at.desc())
-        .first()
-    )
+    history = get_practice_history_items(db=db, learner_id=learner_id)
 
-    if not latest_task:
+    if not history:
         return None
 
-    task, attempt, metric = latest_task
-    score = metric.task_score if metric else None
+    latest = history[0]
 
     return {
-        "task_id": task.id,
-        "title": task.title,
-        "practice_type": task.practice_type,
-        "target_skill": task.target_skill,
-        "score": score,
-        "created_at": attempt.created_at,
+        "task_id": latest.attempt_id,
+        "title": latest.title,
+        "practice_type": latest.practice_type,
+        "target_skill": latest.target_skill,
+        "score": latest.score,
+        "created_at": latest.completed_date,
     }
 
 
