@@ -4,17 +4,15 @@ import {
   Flag,
   Route,
   Target,
+  TrendingUp,
 } from "lucide-react";
-import { useLearnerIntelligence } from "../../hooks/useLearnerIntelligence";
+import { useLearningPath } from "../../hooks/useLearningPath";
 
-const learnerId = 1;
-
-const formatLabel = (value: string | null) =>
-  value ? value.replaceAll("_", " ") : "No data";
+const formatLabel = (value: string) =>
+  value.replaceAll("_", " ");
 
 export default function LearningPath() {
-  const { data, isLoading, error } =
-    useLearnerIntelligence(learnerId);
+  const { data, isLoading, error } = useLearningPath();
 
   if (isLoading) {
     return (
@@ -36,7 +34,7 @@ export default function LearningPath() {
     );
   }
 
-  const path = data.learning_path;
+  const completed = data.tasks.filter((task) => task.completed);
 
   return (
     <div className="space-y-8">
@@ -53,28 +51,28 @@ export default function LearningPath() {
         <div className="rounded-2xl bg-white p-6 shadow-sm">
           <p className="text-sm text-gray-500">Current Level</p>
           <h2 className="mt-2 text-3xl font-bold text-[#3D348B]">
-            {path.current_level}
+            {data.current_level}
           </h2>
         </div>
 
         <div className="rounded-2xl bg-white p-6 shadow-sm">
-          <p className="text-sm text-gray-500">Current Focus</p>
+          <p className="text-sm text-gray-500">Overall Progress</p>
+          <h2 className="mt-2 text-3xl font-bold text-[#3D348B]">
+            {data.overall_progress}%
+          </h2>
+        </div>
+
+        <div className="rounded-2xl bg-white p-6 shadow-sm">
+          <p className="text-sm text-gray-500">Current Goal</p>
           <h2 className="mt-2 text-2xl font-bold capitalize text-[#3D348B]">
-            {formatLabel(path.current_focus)}
+            {formatLabel(data.current_focus)}
           </h2>
         </div>
 
         <div className="rounded-2xl bg-white p-6 shadow-sm">
-          <p className="text-sm text-gray-500">Progress</p>
-          <h2 className="mt-2 text-3xl font-bold text-[#3D348B]">
-            {path.progress ?? "No data"}
-          </h2>
-        </div>
-
-        <div className="rounded-2xl bg-white p-6 shadow-sm">
-          <p className="text-sm text-gray-500">Active Goals</p>
-          <h2 className="mt-2 text-3xl font-bold text-[#3D348B]">
-            {path.goals.length}
+          <p className="text-sm text-gray-500">Next Milestone</p>
+          <h2 className="mt-2 text-2xl font-bold text-[#3D348B]">
+            {data.next_milestone}
           </h2>
         </div>
       </div>
@@ -87,26 +85,15 @@ export default function LearningPath() {
           </h2>
         </div>
 
-        {path.recommended_practice ? (
-          <div className="mt-5 rounded-xl border border-gray-100 bg-[#F5F6FC] p-5">
-            <p className="font-semibold capitalize text-[#3D348B]">
-              {formatLabel(
-                path.recommended_practice.affected_skill
-              )}
-            </p>
-            <p className="mt-2 text-gray-600">
-              {path.recommended_practice.recommendation}
-            </p>
-            <p className="mt-3 text-sm text-gray-500">
-              {path.recommended_practice.reason}
-            </p>
-          </div>
-        ) : (
-          <p className="mt-5 text-gray-500">
-            No recommendation is available from the current learner
-            data.
+        <div className="mt-5 rounded-xl border border-gray-100 bg-[#F5F6FC] p-5">
+          <p className="font-semibold capitalize text-[#3D348B]">
+            {formatLabel(data.recommended_practice)}
           </p>
-        )}
+          <p className="mt-2 text-gray-600">{data.today_recommendation}</p>
+          <p className="mt-3 text-sm text-gray-500">
+            Focus on the weakest skill to keep the roadmap adaptive.
+          </p>
+        </div>
       </section>
 
       <section className="grid grid-cols-1 gap-8 xl:grid-cols-3">
@@ -119,35 +106,26 @@ export default function LearningPath() {
           </div>
 
           <div className="mt-5 space-y-4">
-            {path.goals.map((goal) => (
+            {data.tasks.map((task) => (
               <div
-                key={`${goal.target_skill}-${goal.priority}`}
+                key={task.title}
                 className="rounded-xl border border-gray-100 p-5"
               >
                 <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                   <div>
                     <h3 className="font-semibold text-[#4A4B4B]">
-                      {goal.goal}
+                      {task.title}
                     </h3>
                     <p className="mt-1 text-sm text-gray-500">
-                      {goal.reason}
+                      {task.completed ? "Completed" : "Pending"}
                     </p>
                   </div>
                   <span className="rounded-full bg-[#D0E6FF] px-4 py-2 text-sm font-semibold text-[#3D348B]">
-                    Priority {goal.priority}
+                    {task.completed ? "Done" : "Open"}
                   </span>
                 </div>
-                <p className="mt-3 text-sm text-gray-500">
-                  {goal.success_metric}
-                </p>
               </div>
             ))}
-
-            {path.goals.length === 0 && (
-              <p className="text-gray-500">
-                No adaptive goals are available yet.
-              </p>
-            )}
           </div>
         </div>
 
@@ -160,15 +138,14 @@ export default function LearningPath() {
               </h2>
             </div>
             <div className="mt-4 space-y-3">
-              {path.completed_skills.map((skill) => (
+              {data.completed_tasks.length > 0 ? data.completed_tasks.map((task) => (
                 <div
-                  key={skill}
+                  key={task.title}
                   className="rounded-lg bg-[#F5F6FC] px-4 py-3 text-sm font-medium capitalize text-[#4A4B4B]"
                 >
-                  {formatLabel(skill)}
+                  {task.title}
                 </div>
-              ))}
-              {path.completed_skills.length === 0 && (
+              )) : (
                 <p className="text-sm text-gray-500">
                   No completed skills have been identified yet.
                 </p>
@@ -184,15 +161,15 @@ export default function LearningPath() {
               </h2>
             </div>
             <div className="mt-4 space-y-3">
-              {path.remaining_skills.map((skill) => (
+              {data.weak_skills.map((skill) => (
                 <div
                   key={skill}
                   className="rounded-lg bg-[#F5F6FC] px-4 py-3 text-sm font-medium capitalize text-[#4A4B4B]"
                 >
-                  {formatLabel(skill)}
+                  {skill}
                 </div>
               ))}
-              {path.remaining_skills.length === 0 && (
+              {data.weak_skills.length === 0 && (
                 <p className="text-sm text-gray-500">
                   No remaining priority skills are available.
                 </p>
@@ -217,16 +194,29 @@ export default function LearningPath() {
               className="rounded-xl border border-gray-100 p-5"
             >
               <p className="text-sm font-semibold text-[#3D348B]">
-                Step {index + 1}
-              </p>
-              <h3 className="mt-2 font-semibold text-[#4A4B4B]">
-                {goal.goal}
-              </h3>
+              {item.date}
+            </p>
+              <h3 className="mt-2 font-semibold text-[#4A4B4B]">{item.score}</h3>
               <p className="mt-2 text-sm capitalize text-gray-500">
-                {formatLabel(goal.suggested_practice_type)}
+                Score trend
               </p>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="rounded-2xl bg-white p-6 shadow-sm">
+        <div className="flex items-center gap-3">
+          <TrendingUp className="text-[#3D348B]" size={24} />
+          <h2 className="text-xl font-bold text-[#3D348B]">
+            Progress Bar
+          </h2>
+        </div>
+        <div className="mt-5 h-4 rounded-full bg-gray-100">
+          <div
+            className="h-4 rounded-full bg-gradient-to-r from-[#3D348B] to-[#4CB1FF]"
+            style={{ width: `${data.progress_bar}%` }}
+          />
         </div>
       </section>
     </div>
