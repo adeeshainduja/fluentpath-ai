@@ -21,7 +21,20 @@ export default function RecommendedPractice({
   const navigate = useNavigate();
 
   const handleContinue = () => {
-    navigate(`/practice/${id}`);
+    if (id > 0) {
+      navigate(`/practice/${id}`);
+      return;
+    }
+
+    const routeMap: Record<string, string> = {
+      writing: "/practice",
+      speaking: "/practice/speaking",
+      reading: "/practice/reading",
+      listening: "/practice/listening",
+      vocabulary: "/practice/vocabulary",
+    };
+
+    navigate(routeMap[practiceType.toLowerCase()] ?? "/practice");
   };
 
   return (

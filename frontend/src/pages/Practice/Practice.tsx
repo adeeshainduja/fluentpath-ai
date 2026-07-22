@@ -53,7 +53,7 @@ export default function Practice() {
   const {
     data: recommendation,
     isLoading,
-  } = useRecommendation(user?.id ?? 0);
+  } = useRecommendation();
 
   const startPractice = async (practiceType: string) => {
     if (practiceType === "Speaking") {
@@ -110,12 +110,12 @@ export default function Practice() {
       {/* AI Recommendation */}
       {!isLoading && recommendation && (
         <RecommendedPractice
-          id={recommendation.id}
-          title={recommendation.title}
-          practiceType={recommendation.practice_type}
-          skill={recommendation.skill}
+          id={0}
+          title={recommendation.recommendedPractice}
+          practiceType={recommendation.recommendedPractice.toLowerCase()}
+          skill={recommendation.recommendedPractice}
           difficulty={recommendation.difficulty}
-          estimatedMinutes={recommendation.estimated_minutes}
+          estimatedMinutes={parseInt(recommendation.estimatedTime, 10) || 15}
         />
       )}
 

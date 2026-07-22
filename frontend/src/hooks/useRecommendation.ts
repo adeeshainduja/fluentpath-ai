@@ -1,46 +1,9 @@
-import { useEffect, useState } from "react";
-
+import { useQuery } from "@tanstack/react-query";
 import { getRecommendation } from "../services/recommendationApi";
 
-export function useRecommendation(
-  learnerId: number
-) {
-  const [data, setData] = useState<any>(null);
-
-  const [isLoading, setLoading] =
-    useState(true);
-
-  const [error, setError] =
-    useState(false);
-
-  useEffect(() => {
-    async function load() {
-      if (!learnerId) {
-        setData(null);
-        setLoading(false);
-        return;
-      }
-
-      try {
-        setLoading(true);
-
-        const result =
-          await getRecommendation(learnerId);
-
-        setData(result);
-      } catch {
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    load();
-  }, [learnerId]);
-
-  return {
-    data,
-    isLoading,
-    error,
-  };
+export function useRecommendation() {
+  return useQuery({
+    queryKey: ["adaptive-practice-recommendation"],
+    queryFn: getRecommendation,
+  });
 }

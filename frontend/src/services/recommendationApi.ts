@@ -1,12 +1,9 @@
-import axios from "axios";
+import api from "./axios";
+import type { AdaptivePracticeRecommendation } from "../types/adaptivePractice";
 
-const API_BASE_URL = "http://localhost:8000/api/v1";
-
-export async function getRecommendation(
-  learnerId: number
-) {
-  const response = await axios.get(
-    `${API_BASE_URL}/recommendations/${learnerId}`
+export async function getRecommendation(): Promise<AdaptivePracticeRecommendation> {
+  const response = await api.get<AdaptivePracticeRecommendation>(
+    "/practice/recommend"
   );
 
   return response.data;
