@@ -84,6 +84,7 @@ export default function VocabularyPractice() {
         queryClient.invalidateQueries({ queryKey: ["dashboard"] }),
         queryClient.invalidateQueries({ queryKey: ["history"] }),
         queryClient.invalidateQueries({ queryKey: ["analytics"] }),
+        queryClient.invalidateQueries({ queryKey: ["learning-path"] }),
       ]);
     } catch {
       setMessage("Vocabulary submission could not be saved. Please try again.");
