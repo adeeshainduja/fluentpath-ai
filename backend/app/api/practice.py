@@ -14,15 +14,35 @@ from app.schemas.practice import (
 from app.memory.learner_memory import (
     get_learner_weaknesses,
 )
+from app.schemas.adaptive_practice import (
+    AdaptivePracticeRecommendation,
+)
 
 from app.services.practice_detail_service import (
     get_practice_detail,
+)
+from app.services.adaptive_practice_service import (
+    get_adaptive_practice_recommendation,
 )
 
 router = APIRouter(
     prefix="/api/v1/practice",
     tags=["Practice"],
 )
+
+
+@router.get("/recommend", response_model=AdaptivePracticeRecommendation)
+def recommend_practice(
+    current_user: User | None = Depends(get_optional_current_user),
+    db: Session = Depends(get_db),
+):
+    if current_user is None:
+        raise HTTPException(status_code=401, detail="Authentication required")
+
+    return get_adaptive_practice_recommendation(
+        db=db,
+        learner_id=current_user.id,
+    )
 
 
 # --------------------------------------------------

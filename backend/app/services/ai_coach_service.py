@@ -7,6 +7,9 @@ from app.models.coach_memory import CoachMemory
 from app.models.error_pattern import ErrorPattern
 from app.schemas.learning_path import LearningPathResponse
 from app.services.analytics_service import get_user_analytics, get_recent_attempts
+from app.services.adaptive_practice_service import (
+    get_adaptive_practice_recommendation,
+)
 from app.services.learning_path_service import get_learning_path
 
 
@@ -134,10 +137,18 @@ def _conversation_history(db: Session, learner_id: int) -> list[dict]:
 def chat_with_coach(db: Session, learner_id: int, message: str) -> dict:
     analytics = get_user_analytics(db=db, learner_id=learner_id)
     learning_path = get_learning_path(db=db, learner_id=learner_id)
+    recommendation = get_adaptive_practice_recommendation(
+        db=db,
+        learner_id=learner_id,
+    )
     recent_attempts = get_recent_attempts(db=db, learner_id=learner_id)
     weaknesses = get_learner_weaknesses(db=db, learner_id=learner_id)
     mistakes = _summarize_recent_mistakes(db, learner_id)
     reply = _build_reply(message, analytics, learning_path, recent_attempts, mistakes)
+    if "today" in message.lower():
+        reply = (
+            f"{reply} Today's adaptive recommendation is {recommendation['recommendedPractice']} at {recommendation['difficulty']} level for about {recommendation['estimatedTime']}."
+        )
     _store_memory(db, learner_id, message, reply, learning_path)
     history = _conversation_history(db, learner_id)
     learner_summary = {
@@ -156,8 +167,8 @@ def chat_with_coach(db: Session, learner_id: int, message: str) -> dict:
         "suggested_questions": SUGGESTED_QUESTIONS,
         "current_learner_summary": learner_summary,
         "recommended_next_action": {
-            "title": f"Practice {learning_path.recommended_practice}",
-            "description": learning_path.today_recommendation,
+            "title": f"Practice {recommendation['recommendedPractice']}",
+            "description": recommendation["reason"],
         },
         "weak_skills": [w.category.title() for w in weaknesses[:2]],
         "strong_skills": learning_path.strong_skills,
