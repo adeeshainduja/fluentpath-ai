@@ -11,6 +11,7 @@ from app.core.database import Base, engine
 # --------------------------------------------------
 
 from app.models.analysis import Analysis
+from app.models.coach_memory import CoachMemory
 from app.models.correction_state import CorrectionState
 from app.models.error_pattern import ErrorPattern
 from app.models.evaluation_records import (
@@ -80,6 +81,9 @@ from app.api.dashboard import router as dashboard_router
 from app.api.learning_path import (
     router as learning_path_router,
 )
+from app.api.ai_coach import (
+    router as ai_coach_router,
+)
 from app.api.speaking import (
     router as speaking_router,
 )
@@ -148,6 +152,7 @@ app.include_router(practice_strategies_router)
 app.include_router(practice_sessions_router)
 app.include_router(dashboard_router)
 app.include_router(learning_path_router)
+app.include_router(ai_coach_router)
 app.include_router(speaking_router)
 app.include_router(reading_router)
 app.include_router(listening_router)
