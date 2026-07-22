@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.models.practice_attempt import PracticeAttempt
 from app.models.practice_task import PracticeTask
 from app.models.progress_metric import ProgressMetric
+from app.services.ai_generation_service import generate_reading_content
 
 
 READING_SAMPLE = {
@@ -87,6 +88,38 @@ READING_SAMPLE = {
 
 def get_reading_practice() -> dict:
     return READING_SAMPLE
+
+
+def get_personalized_reading_practice(
+    db: Session,
+    learner_id: int,
+) -> dict:
+    generated = generate_reading_content(
+        db=db,
+        learner_id=learner_id,
+    )
+
+    questions = [
+        {
+            "id": item["id"],
+            "question": item["question"],
+            "options": item["options"],
+        }
+        for item in generated.get("questions", [])
+    ]
+
+    if not questions:
+        return READING_SAMPLE
+
+    return {
+        "passage_id": generated.get("passage_id", READING_SAMPLE["passage_id"]),
+        "passage": {
+            "title": generated.get("title", READING_SAMPLE["passage"]["title"]),
+            "text": generated.get("passage", READING_SAMPLE["passage"]["text"]),
+        },
+        "estimated_minutes": generated.get("estimated_minutes", READING_SAMPLE["estimated_minutes"]),
+        "questions": questions,
+    }
 
 
 def submit_reading_practice(

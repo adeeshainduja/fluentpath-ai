@@ -11,6 +11,7 @@ from app.schemas.reading import (
 )
 from app.services.reading_service import (
     get_reading_practice,
+    get_personalized_reading_practice,
     submit_reading_practice,
 )
 
@@ -26,8 +27,12 @@ router = APIRouter(
 )
 def generate_reading(
     current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ):
-    return get_reading_practice()
+    return get_personalized_reading_practice(
+        db=db,
+        learner_id=current_user.id,
+    )
 
 
 @router.post(

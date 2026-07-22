@@ -1,5 +1,6 @@
 import { useDashboard } from "../../hooks/useDashboard";
 import { useAuth } from "../../hooks/useAuth";
+import { useRecommendation } from "../../hooks/useRecommendation";
 
 import SummaryGrid from "../../components/dashboard/SummaryGrid";
 import RecommendationCard from "../../components/dashboard/RecommendationCard";
@@ -10,6 +11,7 @@ import AchievementBadges from "../../components/dashboard/AchievementBadges";
 export default function Dashboard() {
   const { user } = useAuth();
   const { data, isLoading, error } = useDashboard();
+  const { data: recommendation } = useRecommendation();
 
   if (isLoading) {
     return (
@@ -50,7 +52,10 @@ export default function Dashboard() {
           <GoalCard dashboard={data} />
         </div>
 
-        <RecommendationCard dashboard={data} />
+        <RecommendationCard
+          recommendation={recommendation ?? null}
+          learnerName={user?.full_name ?? data.learner_name}
+        />
       </div>
 
       <section className="rounded-3xl bg-white p-6 shadow-sm">

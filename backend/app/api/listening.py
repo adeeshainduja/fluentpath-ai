@@ -11,6 +11,7 @@ from app.schemas.listening import (
 )
 from app.services.listening_service import (
     get_listening_practice,
+    get_personalized_listening_practice,
     submit_listening_practice,
 )
 
@@ -26,8 +27,12 @@ router = APIRouter(
 )
 def generate_listening(
     current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ):
-    return get_listening_practice()
+    return get_personalized_listening_practice(
+        db=db,
+        learner_id=current_user.id,
+    )
 
 
 @router.post(
