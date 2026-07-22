@@ -7,6 +7,7 @@ from app.models.evaluation_records import VocabularyProgress
 from app.models.practice_attempt import PracticeAttempt
 from app.models.practice_task import PracticeTask
 from app.models.progress_metric import ProgressMetric
+from app.services.ai_generation_service import generate_vocabulary_content
 
 
 VOCABULARY_SAMPLE = {
@@ -71,6 +72,32 @@ VOCABULARY_SAMPLE = {
 
 def get_vocabulary_practice() -> dict:
     return VOCABULARY_SAMPLE
+
+
+def get_personalized_vocabulary_practice(
+    db: Session,
+    learner_id: int,
+) -> dict:
+    generated = generate_vocabulary_content(
+        db=db,
+        learner_id=learner_id,
+    )
+    questions = [
+        {
+            "id": item["id"],
+            "word": item["word"],
+            "question": item["question"],
+            "options": item["options"],
+        }
+        for item in generated.get("questions", [])
+    ]
+    if not questions:
+        return VOCABULARY_SAMPLE
+    return {
+        "sessionId": generated.get("session_id", VOCABULARY_SAMPLE["sessionId"]),
+        "difficulty": generated.get("difficulty", VOCABULARY_SAMPLE["difficulty"]),
+        "questions": questions,
+    }
 
 
 def submit_vocabulary_practice(

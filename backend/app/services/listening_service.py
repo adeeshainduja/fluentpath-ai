@@ -7,6 +7,7 @@ from app.models.evaluation_records import ListeningEvaluation
 from app.models.practice_attempt import PracticeAttempt
 from app.models.practice_task import PracticeTask
 from app.models.progress_metric import ProgressMetric
+from app.services.ai_generation_service import generate_listening_content
 
 
 LISTENING_SAMPLE = {
@@ -84,6 +85,33 @@ LISTENING_SAMPLE = {
 
 def get_listening_practice() -> dict:
     return LISTENING_SAMPLE
+
+
+def get_personalized_listening_practice(
+    db: Session,
+    learner_id: int,
+) -> dict:
+    generated = generate_listening_content(
+        db=db,
+        learner_id=learner_id,
+    )
+    questions = [
+        {
+            "id": item["id"],
+            "question": item["question"],
+            "options": item["options"],
+        }
+        for item in generated.get("questions", [])
+    ]
+    if not questions:
+        return LISTENING_SAMPLE
+    return {
+        "practice_id": generated.get("practice_id", LISTENING_SAMPLE["practice_id"]),
+        "audio_url": generated.get("audio_url", LISTENING_SAMPLE["audio_url"]),
+        "transcript": generated.get("transcript", LISTENING_SAMPLE["transcript"]),
+        "estimated_minutes": generated.get("estimated_minutes", LISTENING_SAMPLE["estimated_minutes"]),
+        "questions": questions,
+    }
 
 
 def submit_listening_practice(

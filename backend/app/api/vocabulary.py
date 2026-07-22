@@ -11,6 +11,7 @@ from app.schemas.vocabulary import (
 )
 from app.services.vocabulary_service import (
     get_vocabulary_practice,
+    get_personalized_vocabulary_practice,
     submit_vocabulary_practice,
 )
 
@@ -26,8 +27,12 @@ router = APIRouter(
 )
 def generate_vocabulary(
     current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ):
-    return get_vocabulary_practice()
+    return get_personalized_vocabulary_practice(
+        db=db,
+        learner_id=current_user.id,
+    )
 
 
 @router.post(
