@@ -1,49 +1,15 @@
-import axios from "axios";
+import api from "./axios";
+import type {
+  LearningPathResponse,
+  LearningPathUpdateResponse,
+} from "../types/learningPath";
 
-const API_BASE_URL = "http://localhost:8000/api/v1";
+export const getLearningPath = async (): Promise<LearningPathResponse> => {
+  const response = await api.get<LearningPathResponse>("/learning-path");
+  return response.data;
+};
 
-export interface RoadmapItem {
-  id: number;
-  title: string;
-  skill: string;
- difficulty: string;
-  estimated_minutes: number;
-  status: "completed" | "current" | "locked";
-}
-
-export interface CurrentStage {
-  id: number;
-  title: string;
-  skill: string;
-  difficulty: string;
-  estimated_minutes: number;
-}
-
-export interface Badge {
-  id: number;
-  title: string;
-  description: string;
-  earned: boolean;
-}
-
-export interface LearningPathResponse {
-  overall_progress: number;
-  streak: number;
-  coach_message: string;
-
-  current_stage: CurrentStage;
-
-  roadmap: RoadmapItem[];
-
-  badges: Badge[];
-}
-
-export const getLearningPath = async (
-  learnerId: number
-): Promise<LearningPathResponse> => {
-  const response = await axios.get(
-    `${API_BASE_URL}/learning-path/${learnerId}`
-  );
-
+export const updateLearningPath = async (): Promise<LearningPathUpdateResponse> => {
+  const response = await api.post<LearningPathUpdateResponse>("/learning-path/update");
   return response.data;
 };

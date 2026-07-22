@@ -96,6 +96,9 @@ export default function ReadingPractice() {
         queryClient.invalidateQueries({
           queryKey: ["analytics"],
         }),
+        queryClient.invalidateQueries({
+          queryKey: ["learning-path"],
+        }),
       ]);
     } catch {
       setMessage(

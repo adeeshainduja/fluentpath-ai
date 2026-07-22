@@ -1,42 +1,30 @@
-export type LessonStatus =
-  | "completed"
-  | "current"
-  | "locked";
-
-export interface RoadmapItem {
-  id: number;
+export interface LearningPathTask {
   title: string;
-  skill: string;
-  difficulty: string;
-  estimated_minutes: number;
-  status: LessonStatus;
-}
-
-export interface CurrentStage {
-  id: number;
-  title: string;
-  skill: string;
-  difficulty: string;
-  estimated_minutes: number;
-}
-
-export interface Badge {
-  id: number;
-  title: string;
-  description: string;
-  earned: boolean;
+  completed: boolean;
 }
 
 export interface LearningPathResponse {
+  current_level: string;
   overall_progress: number;
+  current_focus: string;
+  recommended_practice: string;
+  next_milestone: string;
+  tasks: LearningPathTask[];
+  weak_skills: string[];
+  strong_skills: string[];
+  learning_timeline: Array<{ date: string; score: number }>;
+  skill_roadmap: Array<{
+    skill: string;
+    priority: string;
+    target_score: number;
+  }>;
+  weekly_tasks: LearningPathTask[];
+  completed_tasks: LearningPathTask[];
+  progress_bar: number;
+  today_recommendation: string;
+}
 
-  streak: number;
-
-  coach_message: string;
-
-  current_stage: CurrentStage;
-
-  roadmap: RoadmapItem[];
-
-  badges: Badge[];
+export interface LearningPathUpdateResponse {
+  status: "updated";
+  path: LearningPathResponse;
 }

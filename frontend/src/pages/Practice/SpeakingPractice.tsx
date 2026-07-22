@@ -221,6 +221,9 @@ export default function SpeakingPractice() {
         queryClient.invalidateQueries({
           queryKey: ["analytics"],
         }),
+        queryClient.invalidateQueries({
+          queryKey: ["learning-path"],
+        }),
       ]);
     } catch {
       setMessage(
