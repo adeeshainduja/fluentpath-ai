@@ -24,10 +24,17 @@ def _round(value: float | None) -> float:
     return round(float(value or 0), 2)
 
 
-def _avg(values: list[float | int]) -> float:
-    if not values:
+def _avg(values) -> float:
+    clean_values = [
+        float(v)
+        for v in values
+        if v is not None
+    ]
+
+    if not clean_values:
         return 0.0
-    return _round(sum(values) / len(values))
+
+    return _round(sum(clean_values) / len(clean_values))
 
 
 def _metric_points(metrics: list[ProgressMetric]) -> list[dict]:
