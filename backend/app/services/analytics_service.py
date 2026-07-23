@@ -158,11 +158,11 @@ def _module_averages(db: Session, learner_id: int) -> dict[str, float]:
     speaking_scores: list[float] = []
     for (result,) in speaking_rows:
         components = [
-            float(result.get("grammar_score", 0)),
-            float(result.get("vocabulary_score", 0)),
-            float(result.get("fluency_score", 0)),
-            float(result.get("pronunciation_score", 0)),
-            float(result.get("confidence_score", 0)),
+            float(result.get("grammar_score") or 0),
+            float(result.get("vocabulary_score") or 0),
+            float(result.get("fluency_score") or 0),
+            float(result.get("pronunciation_score") or 0),
+            float(result.get("confidence_score") or 0),
         ]
         speaking_scores.append(sum(components) / len(components))
     speaking = _avg(speaking_scores)
