@@ -27,15 +27,6 @@ from app.services.practice_history_service import (
 )
 
 
-SCORE_FIELDS = {
-    "grammar": "grammar_score",
-    "vocabulary": "vocabulary_score",
-    "fluency": "fluency_score",
-    "pronunciation": "pronunciation_score",
-    "confidence": "confidence_score",
-}
-
-
 def _score_trend(scores: list[int]) -> str:
     if len(scores) < 2:
         return "not_enough_data"
@@ -49,6 +40,10 @@ def _score_trend(scores: list[int]) -> str:
         return "declining"
 
     return "stable"
+
+
+def _history_timestamp(item: PracticeHistoryItem):
+    return item.completed_date
 
 
 def _severity(score: float | None) -> str:
@@ -122,7 +117,7 @@ def _active_streak(
 ) -> int:
     practice_days = sorted(
         {
-            item.created_at.date()
+            item.completed_date.date()
             for item in items
         },
         reverse=True,
@@ -147,45 +142,18 @@ def _active_streak(
 def _dimension_scores(
     items: list[PracticeHistoryItem],
 ) -> dict[str, list[tuple[datetime, int]]]:
-    grouped: dict[str, list[tuple[datetime, int]]] = {
-        skill: []
-        for skill in SCORE_FIELDS
-    }
-
-    for item in sorted(
-        items,
-        key=lambda history_item: history_item.created_at,
-    ):
-        for skill, field_name in SCORE_FIELDS.items():
-            score = getattr(item, field_name)
-
-            if score is not None:
-                grouped[skill].append(
-                    (
-                        item.created_at,
-                        score,
-                    )
-                )
-
-    return grouped
-
-
-def _target_skill_scores(
-    items: list[PracticeHistoryItem],
-) -> dict[str, list[tuple[datetime, int]]]:
     grouped: dict[str, list[tuple[datetime, int]]] = defaultdict(list)
 
-    for item in sorted(
-        items,
-        key=lambda history_item: history_item.created_at,
-    ):
-        if item.target_skill and item.score is not None:
-            grouped[item.target_skill].append(
-                (
-                    item.created_at,
-                    item.score,
-                )
+    for item in sorted(items, key=_history_timestamp):
+        if item.score is None:
+            continue
+        skill = item.target_skill or item.practice_type or "overall"
+        grouped[skill].append(
+            (
+                item.completed_date,
+                item.score,
             )
+        )
 
     return grouped
 
@@ -194,7 +162,6 @@ def _average_skill_scores(
     items: list[PracticeHistoryItem],
 ) -> list[SkillAverage]:
     grouped = _dimension_scores(items)
-    grouped.update(_target_skill_scores(items))
 
     skill_averages: list[SkillAverage] = []
 
@@ -237,7 +204,7 @@ def analyze_performance(
 
     chronological_items = sorted(
         items,
-        key=lambda item: item.created_at,
+        key=_history_timestamp,
     )
 
     scored_items = [
@@ -253,7 +220,7 @@ def analyze_performance(
     ]
 
     active_days = {
-        item.created_at.date()
+        item.completed_date.date()
         for item in items
     }
 
@@ -263,25 +230,25 @@ def analyze_performance(
 
     speaking_trend = [
         ScoreTrendPoint(
-            date=item.created_at.date().isoformat(),
+            date=item.completed_date.date().isoformat(),
             score=item.score,
             practice_type=item.practice_type,
             skill=item.target_skill,
         )
         for item in chronological_items
-        if item.source == "speaking_attempt"
+        if item.practice_type == "speaking"
         and item.score is not None
     ]
 
     writing_trend = [
         ScoreTrendPoint(
-            date=item.created_at.date().isoformat(),
+            date=item.completed_date.date().isoformat(),
             score=item.score,
             practice_type=item.practice_type,
             skill=item.target_skill,
         )
         for item in chronological_items
-        if item.source == "practice_attempt"
+        if item.practice_type != "speaking"
         and item.score is not None
     ]
 
@@ -329,14 +296,14 @@ def analyze_performance(
                 [
                     item
                     for item in items
-                    if item.created_at >= last_7_days
+                    if item.completed_date >= last_7_days
                 ]
             ),
             practices_last_30_days=len(
                 [
                     item
                     for item in items
-                    if item.created_at >= last_30_days
+                    if item.completed_date >= last_30_days
                 ]
             ),
             average_practices_per_active_day=round(
