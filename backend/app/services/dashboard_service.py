@@ -186,6 +186,18 @@ def _get_achievements(db: Session, learner_id: int):
     ]
 
 
+def _as_list(value, fallback: list | None = None) -> list:
+    if isinstance(value, list):
+        return value
+    return fallback if fallback is not None else []
+
+
+def _as_dict(value, fallback: dict | None = None) -> dict:
+    if isinstance(value, dict):
+        return value
+    return fallback if fallback is not None else {}
+
+
 def get_dashboard_data(db: Session, learner_id: int):
     user = db.query(User).filter(User.id == learner_id).first()
 
@@ -222,8 +234,13 @@ def get_dashboard_data(db: Session, learner_id: int):
     achievement_badges = get_achievement_badges(db=db, learner_id=learner_id)
     analytics = get_user_analytics(db=db, learner_id=learner_id)
 
-    learning_timeline = analytics.get("weekly_progress", [])
-    practice_history = get_recent_attempts(db=db, learner_id=learner_id)
+    learning_timeline = _as_list(
+        analytics.get("progress_timeline")
+        or analytics.get("daily_activity")
+        or analytics.get("weekly_score_trend")
+        or analytics.get("monthly_score_trend")
+    )
+    practice_history = _as_list(get_recent_attempts(db=db, learner_id=learner_id))
 
     summary = {
         "average_score": average_score,
@@ -243,6 +260,7 @@ def get_dashboard_data(db: Session, learner_id: int):
             else None
         ),
     }
+    summary = _as_dict(summary)
 
     return {
         "learner_name": user.full_name if user else "Learner",
@@ -260,7 +278,7 @@ def get_dashboard_data(db: Session, learner_id: int):
             "percentage": weekly_progress,
         },
         "completed_practices_this_week": completed_this_week,
-        "achievements": _get_achievements(db, learner_id),
+        "achievements": _as_list(_get_achievements(db, learner_id)),
         "latest_practice": _get_latest_practice(db, learner_id),
         "ai_recommendation_summary": (
             "Keep building consistency and focus on your weakest recent skill."
@@ -268,28 +286,28 @@ def get_dashboard_data(db: Session, learner_id: int):
             else "Start with one practice module to establish a baseline."
         ),
         "summary": summary,
-        "skill_progress": skill_progress,
+        "skill_progress": _as_list(skill_progress),
         "learning_timeline": learning_timeline,
         "practice_history": practice_history,
-        "recommendations": {
+        "recommendations": _as_dict({
             "strategy": recommendations.get("strategy") if isinstance(recommendations, dict) else None,
             "priority_skill": recommendations.get("selected_skill") if isinstance(recommendations, dict) else None,
             "selected_skill": recommendations.get("selected_skill") if isinstance(recommendations, dict) else None,
             "reason": recommendations.get("reason") if isinstance(recommendations, dict) else None,
-        },
-        "error_statistics": {
+        }),
+        "error_statistics": _as_dict({
             "total_errors": len(analytics.get("skill_trend", [])),
             "active_errors": len(analytics.get("skill_trend", [])),
             "resolved_errors": 0,
             "error_distribution": {},
-        },
-        "trend_analytics": {
+        }),
+        "trend_analytics": _as_dict({
             "average_score": analytics.get("average_score", 0),
             "weekly_change": analytics.get("weekly_progress", 0),
             "monthly_change": analytics.get("monthly_progress", 0),
             "recent_improvement": analytics.get("recent_improvement", 0),
-        },
-        "weak_skills": weak_skills,
-        "daily_missions": daily_missions,
-        "achievement_badges": achievement_badges,
+        }),
+        "weak_skills": _as_list(weak_skills),
+        "daily_missions": _as_list(daily_missions),
+        "achievement_badges": _as_list(achievement_badges),
     }

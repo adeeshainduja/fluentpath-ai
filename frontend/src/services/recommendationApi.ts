@@ -1,4 +1,4 @@
-import api from "./axios";
+import api from "../api/axios";;
 import type { AdaptivePracticeRecommendation } from "../types/adaptivePractice";
 
 export async function getRecommendation(): Promise<AdaptivePracticeRecommendation> {
