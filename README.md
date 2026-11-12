@@ -4,12 +4,6 @@ An AI-powered English learning platform that helps learners improve their commun
 
 ---
 
-## 🎥 Demo
-
-▶️ **Watch the Demo Video**
-
-https://youtu.be/8chrDu55LBU
-
 ---
 
 # 📖 Overview
